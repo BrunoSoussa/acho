@@ -3,20 +3,20 @@ import chromadb
 from chromadb.config import Settings
 from sentence_transformers import SentenceTransformer
 import pandas as pd
-from data.pipeline import TextProcessor
+from data.pipeline import TextPipeline
 
 class TextSimilarityAPI:
-    def __init__(self, db_path, embedding_model_path):
+    def __init__(self, db_path):
         # Configurações do ChromaDB
         self.chroma_settings = Settings(persist_directory=db_path, anonymized_telemetry=False)
 
         # Inicialização do cliente do ChromaDB e modelo de embeddings
-        self.embedding_model =  SentenceTransformer(embedding_model_path)
+        self.embedding_model =  SentenceTransformer('SenhorDasMoscas/acho2-ptbr-e4-lr3e-05')
         self.client = chromadb.PersistentClient(path=self.chroma_settings.persist_directory, settings=self.chroma_settings)
         self.collection = self.client.get_or_create_collection(name="text_similarity", metadata={"hnsw:space": "cosine"})
 
         # Inicialização do processador de texto
-        self.text_processor = TextProcessor()
+        self.text_processor = TextPipeline()
 
     def add_text(self, text_id, text):
         text_clean = self.text_processor.preprocess_text(text)
@@ -30,7 +30,7 @@ class TextSimilarityAPI:
         return text_clean
 
     def search_text(self, query, top_k):
-        query_embedding = self.embedding_model.encode([query])[0]
+        query_embedding = self.embedding_model.encode([self.text_processor.preprocess(query)])[0]
         results = self.collection.query(
             query_embeddings=[query_embedding.tolist()],
             n_results=top_k
@@ -42,8 +42,8 @@ class TextSimilarityAPI:
         unique_texts = data['Text2'].unique()
 
         for idx, text in enumerate(unique_texts):
-            text_clean = text #self.text_processor.preprocess_text(text)
-            embedding = self.embedding_model.encode([text])[0]
+            text_clean = self.text_processor.preprocess(text)
+            embedding = self.embedding_model.encode([text_clean])[0]
 
             self.collection.add(
                 documents=[text],
@@ -53,9 +53,8 @@ class TextSimilarityAPI:
 
 
 
-
-text_similarity_api = TextSimilarityAPI(db_path="db_dir", embedding_model_path=r"models\temtembinary")
-text_similarity_api.bulk_add_texts(r"dataset_binario_novos_nomes.csv")
+text_similarity_api = TextSimilarityAPI(db_path="db_dir")
+#text_similarity_api.bulk_add_texts(r"C:\Users\bruno\OneDrive\Documentos\tut_projects\recomendator\data\dataset_binario_novos_nomes.csv")
 app = Flask(__name__)
 @app.route('/add_text', methods=['POST'])
 def api_add_text():
