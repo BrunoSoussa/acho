@@ -83,14 +83,14 @@ def api_search_text():
                 {
                     "document": results["documents"][0][i],
                     "id": results["ids"][0][i],
-                    "similarity": 1 - results["distances"][0][i]
+                    "degree_of_certainty": 1 - results["distances"][0][i]
                 }
                 for i in range(len(results["documents"][0]))
             ]  
             print(top_results)
 
             # Verificar se o item de maior similaridade excede 0.93
-            if top_results[0]['similarity'] > 0.93:
+            if top_results[0]['degree_of_certainty'] > 0.93:
                 return jsonify(top_results[0]), 200
 
             # Filtrar os campos `document` e `id` para o prompt do Gemini
