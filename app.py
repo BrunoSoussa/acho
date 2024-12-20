@@ -12,7 +12,7 @@ class TextSimilarityAPI:
         self.chroma_settings = Settings(persist_directory=db_path, anonymized_telemetry=False)
 
         # Inicialização do cliente do ChromaDB e modelo de embeddings
-        self.embedding_model =  SentenceTransformer('SenhorDasMoscas/teste')
+        self.embedding_model =  SentenceTransformer('SenhorDasMoscas/bert-ptbr-teste')
         self.client = chromadb.PersistentClient(path=self.chroma_settings.persist_directory, settings=self.chroma_settings)
         self.collection = self.client.get_or_create_collection(name="text_similarity", metadata={"hnsw:space": "cosine"})
 
@@ -55,7 +55,7 @@ class TextSimilarityAPI:
 
 
 text_similarity_api = TextSimilarityAPI(db_path="db_dir")
-#text_similarity_api.bulk_add_texts(r"analises\dataset_binario_short_category.csv")
+text_similarity_api.bulk_add_texts(r"analises\dataset_binario_short_category.csv")
 app = Flask(__name__)
 @app.route('/add_text', methods=['POST'])
 def api_add_text():
