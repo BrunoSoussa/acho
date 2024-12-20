@@ -4,6 +4,7 @@ from chromadb.config import Settings
 from sentence_transformers import SentenceTransformer
 import pandas as pd
 from data.pipeline import TextPipeline
+import json
 
 class TextSimilarityAPI:
     def __init__(self, db_path):
@@ -11,7 +12,7 @@ class TextSimilarityAPI:
         self.chroma_settings = Settings(persist_directory=db_path, anonymized_telemetry=False)
 
         # Inicialização do cliente do ChromaDB e modelo de embeddings
-        self.embedding_model =  SentenceTransformer('SenhorDasMoscas/acho2-ptbr-e4-lr3e-05')
+        self.embedding_model =  SentenceTransformer('SenhorDasMoscas/teste')
         self.client = chromadb.PersistentClient(path=self.chroma_settings.persist_directory, settings=self.chroma_settings)
         self.collection = self.client.get_or_create_collection(name="text_similarity", metadata={"hnsw:space": "cosine"})
 
@@ -30,7 +31,7 @@ class TextSimilarityAPI:
         return text_clean
 
     def search_text(self, query, top_k):
-        query_embedding = self.embedding_model.encode([self.text_processor.preprocess(query)])[0]
+        query_embedding = self.embedding_model.encode([self.text_processor.preprocess(query)],convert_to_tensor=True)[0]
         results = self.collection.query(
             query_embeddings=[query_embedding.tolist()],
             n_results=top_k
@@ -43,7 +44,7 @@ class TextSimilarityAPI:
 
         for idx, text in enumerate(unique_texts):
             text_clean = self.text_processor.preprocess(text)
-            embedding = self.embedding_model.encode([text_clean])[0]
+            embedding = self.embedding_model.encode([text_clean],convert_to_tensor=True)[0]
 
             self.collection.add(
                 documents=[text],
@@ -54,7 +55,7 @@ class TextSimilarityAPI:
 
 
 text_similarity_api = TextSimilarityAPI(db_path="db_dir")
-#text_similarity_api.bulk_add_texts(r"C:\Users\bruno\OneDrive\Documentos\tut_projects\recomendator\data\dataset_binario_novos_nomes.csv")
+#text_similarity_api.bulk_add_texts(r"analises\dataset_binario_short_category.csv")
 app = Flask(__name__)
 @app.route('/add_text', methods=['POST'])
 def api_add_text():
@@ -73,7 +74,7 @@ def api_search_text():
     try:
         data = request.get_json()
         query = data['query']
-        top_k = data.get('top_k', 10)
+        top_k = data.get('top_k', 5)
 
         results = text_similarity_api.search_text(query, top_k)
 
@@ -87,14 +88,50 @@ def api_search_text():
                 for i in range(len(results["documents"][0]))
             ]
 
-            return jsonify({
-                "total_results": len(top_results),
-                "top_results": top_results
-            }), 200
+            import google.generativeai as genai
+
+            genai.configure(api_key="AIzaSyAgr6SVtn1tfrD_ynYO0eZKXaHQP8ONI28")
+            model = genai.GenerativeModel("gemini-1.5-flash")
+            
+            prompt = f"""
+            você é um modelo de detecção de intenção de compra, para essa intenção "{query}"
+            você recebeu as seguintes possibilidades {top_results}. 
+            Retorne um ID da categoria adequada em formato JSON, com uma única chave 'ID' e um valor sendo a categoria. 
+            Caso não encontre, retorne "None". Não inclua identificadores como ```json ```ou metadados extras.
+            """
+            response = model.generate_content(prompt)
+            response_text = response.text.strip()
+            
+            # Interpretação da resposta
+            if response_text == "None":
+                return jsonify({"message": "Não encontrei uma categoria para o produto. Pode descrever melhor?"}), 404
+            
+            # Parse da categoria retornada
+            try:
+                category_data = json.loads(response_text)
+                category_id = category_data.get("ID")
+                
+                # Localizar o documento correspondente ao ID
+                matching_document = next(
+                    (result for result in top_results if result["id"] == category_id), 
+                    None
+                )
+                
+                if matching_document:
+                    return jsonify(matching_document), 200
+                else:
+                    return jsonify({"message": "ID retornado pelo modelo não encontrado nos resultados."}), 404
+            
+            except json.JSONDecodeError:
+                return jsonify({"error": "Erro ao interpretar a resposta do modelo Gemini."}), 500
+        
         else:
             return jsonify({"message": "Nenhum texto encontrado similar."}), 404
+    
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
 
 @app.route('/bulk_add_texts', methods=['POST'])
 def api_bulk_add_texts():
