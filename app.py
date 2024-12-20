@@ -141,5 +141,11 @@ def api_bulk_add_texts():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route('/hi', methods=['GET'])
+def hi():
+    return "HI"
+
+
+
 if __name__ == '__main__':
     app.run(debug=True)
