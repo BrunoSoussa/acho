@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify,render_template
 import chromadb
 from chromadb.config import Settings
 from sentence_transformers import SentenceTransformer
@@ -55,7 +55,7 @@ class TextSimilarityAPI:
 
 
 text_similarity_api = TextSimilarityAPI(db_path="db_dir")
-text_similarity_api.bulk_add_texts(r"analises\dataset_binario_short_category.csv")
+#text_similarity_api.bulk_add_texts(r"analises\dataset_binario_short_category.csv")
 app = Flask(__name__)
 @app.route('/add_text', methods=['POST'])
 def api_add_text():
@@ -74,7 +74,7 @@ def api_search_text():
     try:
         data = request.get_json()
         query = data['query']
-        top_k = data.get('top_k', 5)
+        top_k = data.get('top_k', 10)
 
         results = text_similarity_api.search_text(query, top_k)
 
@@ -86,8 +86,20 @@ def api_search_text():
                     "similarity": 1 - results["distances"][0][i]
                 }
                 for i in range(len(results["documents"][0]))
-            ]
+            ]  
+            print(top_results)
 
+            # Verificar se o item de maior similaridade excede 0.93
+            if top_results[0]['similarity'] > 0.93:
+                return jsonify(top_results[0]), 200
+
+            # Filtrar os campos `document` e `id` para o prompt do Gemini
+            filtered_results = [
+                {"document": item["document"], "id": item["id"]}
+                for item in top_results
+            ]
+            
+            # Código adicional para chamar o modelo Gemini
             import google.generativeai as genai
 
             genai.configure(api_key="AIzaSyAgr6SVtn1tfrD_ynYO0eZKXaHQP8ONI28")
@@ -95,12 +107,14 @@ def api_search_text():
             
             prompt = f"""
             você é um modelo de detecção de intenção de compra, para essa intenção "{query}"
-            você recebeu as seguintes possibilidades {top_results}. 
+            você recebeu as seguintes possibilidades {filtered_results}. 
             Retorne um ID da categoria adequada em formato JSON, com uma única chave 'ID' e um valor sendo a categoria. 
             Caso não encontre, retorne "None". Não inclua identificadores como ```json ```ou metadados extras.
+
             """
             response = model.generate_content(prompt)
-            response_text = response.text.strip()
+            response_text = response.text.strip().replace("```json","").replace("```","")
+            print(response_text)
             
             # Interpretação da resposta
             if response_text == "None":
@@ -113,7 +127,7 @@ def api_search_text():
                 
                 # Localizar o documento correspondente ao ID
                 matching_document = next(
-                    (result for result in top_results if result["id"] == category_id), 
+                    (result for result in top_results if result["id"] == str(category_id)), 
                     None
                 )
                 
@@ -131,6 +145,9 @@ def api_search_text():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route('/')
+def index():
+    return render_template('index.html')
 
 
 @app.route('/bulk_add_texts', methods=['POST'])
@@ -142,8 +159,25 @@ def api_bulk_add_texts():
         return jsonify({"error": str(e)}), 500
 
 @app.route('/hi', methods=['GET'])
-def hi():
-    return "HI"
+
+@app.route('/get_all_texts', methods=['GET'])
+def api_get_all_texts():
+    try:
+        # Obter todos os documentos e IDs da coleção
+        results = text_similarity_api.collection.get()
+        
+        # Construir uma lista de documentos e seus IDs
+        all_texts = [
+            {
+                "id": results["ids"][i],
+                "document": results["documents"][i]
+            }
+            for i in range(len(results["documents"]))
+        ]
+
+        return jsonify(all_texts), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 
