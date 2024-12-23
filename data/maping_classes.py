@@ -19,7 +19,7 @@ class CategoryMapper:
             "Veículos automotores incluindo carros e motos": "Veículos",
             "Peças e Acessórios Automotivos": "Autopeças",
             "Produtos Alimentícios Básicos": "Mercado",
-            "Itens para Adultos como brinquedos sexuais": "Sexshop",
+            "Itens para Adultos": "Sexshop",
             "Joias e bijuterias": "Joias",
            "Livros e Materiais Literários": "Livros",
             "Esportes": "Esportes",
