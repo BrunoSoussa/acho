@@ -5,18 +5,18 @@ from sentence_transformers import SentenceTransformer
 import pandas as pd
 from data.pipeline import TextPipeline
 import json
+from data.maping_classes import CategoryMapper
 
 class TextSimilarityAPI:
     def __init__(self, db_path):
-        # Configurações do ChromaDB
+  
         self.chroma_settings = Settings(persist_directory=db_path, anonymized_telemetry=False)
 
-        # Inicialização do cliente do ChromaDB e modelo de embeddings
         self.embedding_model =  SentenceTransformer('SenhorDasMoscas/bert-ptbr-teste')
         self.client = chromadb.PersistentClient(path=self.chroma_settings.persist_directory, settings=self.chroma_settings)
         self.collection = self.client.get_or_create_collection(name="text_similarity", metadata={"hnsw:space": "cosine"})
 
-        # Inicialização do processador de texto
+   
         self.text_processor = TextPipeline()
 
     def add_text(self, text_id, text):
@@ -53,7 +53,7 @@ class TextSimilarityAPI:
             )
 
 
-
+category_mapper = CategoryMapper()
 text_similarity_api = TextSimilarityAPI(db_path="db_dir")
 #text_similarity_api.bulk_add_texts(r"analises\dataset_binario_short_category.csv")
 app = Flask(__name__)
@@ -89,11 +89,15 @@ def api_search_text():
             ]  
             print(top_results)
 
-            # Verificar se o item de maior similaridade excede 0.93
+           
             if top_results[0]['degree_of_certainty'] > 0.93:
+                category_name = top_results[0]["document"]
+                adjusted_category_name = category_mapper.map_category(category_name)
+                print(adjusted_category_name)
+                top_results[0]["document"] = adjusted_category_name
                 return jsonify(top_results[0]), 200
+             
 
-            # Filtrar os campos `document` e `id` para o prompt do Gemini
             filtered_results = [
                 {"document": item["document"], "id": item["id"]}
                 for item in top_results
@@ -132,6 +136,10 @@ def api_search_text():
                 )
                 
                 if matching_document:
+                    category_name = matching_document["document"]
+                    adjusted_category_name = category_mapper.map_category(category_name)
+                    matching_document["document"] = adjusted_category_name
+           
                     return jsonify(matching_document), 200
                 else:
                     return jsonify({"message": "ID retornado pelo modelo não encontrado nos resultados."}), 404
@@ -158,19 +166,20 @@ def api_bulk_add_texts():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@app.route('/hi', methods=['GET'])
+
 
 @app.route('/get_all_texts', methods=['GET'])
 def api_get_all_texts():
     try:
         # Obter todos os documentos e IDs da coleção
         results = text_similarity_api.collection.get()
-        
-        # Construir uma lista de documentos e seus IDs
+        print(results)
+
+        # Construir uma lista de documentos e seus IDs, com categorias ajustadas
         all_texts = [
             {
                 "id": results["ids"][i],
-                "document": results["documents"][i]
+                "document": category_mapper.map_category(results["documents"][i])  # Ajusta a categoria
             }
             for i in range(len(results["documents"]))
         ]
@@ -178,7 +187,6 @@ def api_get_all_texts():
         return jsonify(all_texts), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
 
 
 if __name__ == '__main__':
