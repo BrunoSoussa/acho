@@ -25,7 +25,7 @@ class CategoryMapper:
             "Esportes": "Esportes",
             "peixaria e Pescados": "Peixaria",
             "Bebidas Alcoólicas": "Bebidas",
-            "Padaria e Confeitaria": "Padaria e massas",
+            "Padaria e Confeitaria": "Padaria",
             "Acessórios para Pets": "Pets",
             "Doces e Chocolates": "Doces",
             "Presentes e Viagens": "Viagens",
