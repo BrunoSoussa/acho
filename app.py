@@ -20,7 +20,7 @@ class TextSimilarityAPI:
         self.text_processor = TextPipeline()
 
     def add_text(self, text_id, text):
-        text_clean = self.text_processor.preprocess_text(text)
+        text_clean = self.text_processor.preprocess(text)
         embedding = self.embedding_model.encode([text_clean])[0]
         
         self.collection.add(
@@ -51,7 +51,8 @@ class TextSimilarityAPI:
                 ids=[str(idx)],
                 embeddings=[embedding.tolist()]
             )
-
+    def delete_collection(self):
+        self.client.delete_collection(name="text_similarity")
 
 category_mapper = CategoryMapper()
 text_similarity_api = TextSimilarityAPI(db_path="db_dir")
@@ -59,15 +60,29 @@ text_similarity_api = TextSimilarityAPI(db_path="db_dir")
 app = Flask(__name__)
 @app.route('/add_text', methods=['POST'])
 def api_add_text():
-    try:
-        data = request.get_json()
-        text_id = data['id']
-        text = data['text']
-
-        text_clean = text_similarity_api.add_text(text_id, text)
-        return jsonify({"message": f"Texto '{text_clean}' com ID '{text_id}' adicionado com sucesso."}), 200
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    
+    data = request.get_json()
+    
+    if isinstance(data, list):  
+        results = []
+        for item in data:
+            text_id = item['id']
+            text = item['text']
+            text_clean = text_similarity_api.add_text(text_id, text)
+            results.append({
+                "id": text_id,
+                "text": text_clean,
+                "message": f"Texto '{text_clean}' com ID '{text_id}' adicionado com sucesso."
+            })
+        return jsonify(results), 200
+    
+    # Caso seja um único texto
+    text_id = data['id']
+    text = data['text']
+    text_clean = text_similarity_api.add_text(text_id, text)
+    return jsonify({"message": f"Texto '{text_clean}' com ID '{text_id}' adicionado com sucesso."}), 200
+    
+   
 
 @app.route('/search_text', methods=['POST'])
 def api_search_text():
@@ -103,7 +118,7 @@ def api_search_text():
                 for item in top_results
             ]
             
-            # Código adicional para chamar o modelo Gemini
+    
             import google.generativeai as genai
 
             genai.configure(api_key="AIzaSyAgr6SVtn1tfrD_ynYO0eZKXaHQP8ONI28")
@@ -119,12 +134,10 @@ def api_search_text():
             response = model.generate_content(prompt)
             response_text = response.text.strip().replace("```json","").replace("```","")
             print(response_text)
-            
-            # Interpretação da resposta
+           
             if response_text == "None":
                 return jsonify({"message": "Não encontrei uma categoria para o produto. Pode descrever melhor?"}), 404
-            
-            # Parse da categoria retornada
+           
             try:
                 category_data = json.loads(response_text)
                 category_id = category_data.get("ID")
@@ -171,20 +184,28 @@ def api_bulk_add_texts():
 @app.route('/get_all_texts', methods=['GET'])
 def api_get_all_texts():
     try:
-        # Obter todos os documentos e IDs da coleção
+        
         results = text_similarity_api.collection.get()
         print(results)
 
-        # Construir uma lista de documentos e seus IDs, com categorias ajustadas
+
         all_texts = [
             {
                 "id": results["ids"][i],
-                "document": category_mapper.map_category(results["documents"][i])  # Ajusta a categoria
+                "document": category_mapper.map_category(results["documents"][i]) 
             }
             for i in range(len(results["documents"]))
         ]
 
         return jsonify(all_texts), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/delete_collection', methods=['DELETE'])
+def delete_collection():
+    try:
+        text_similarity_api.delete_collection()
+        return jsonify({"message": "Coleção apagada com sucesso."}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
