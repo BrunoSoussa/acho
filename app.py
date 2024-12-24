@@ -43,6 +43,8 @@ class TextSimilarityAPI:
         unique_texts = data['Text2'].unique()
 
         for idx, text in enumerate(unique_texts):
+            if text == 'Padaria e Confeitaria':
+                text = 'Padaria'
             text_clean = self.text_processor.preprocess(text)
             embedding = self.embedding_model.encode([text_clean],convert_to_tensor=True)[0]
 
@@ -56,7 +58,7 @@ class TextSimilarityAPI:
 
 category_mapper = CategoryMapper()
 text_similarity_api = TextSimilarityAPI(db_path="db_dir")
-#text_similarity_api.bulk_add_texts(r"analises\dataset_binario_short_category.csv")
+text_similarity_api.bulk_add_texts(r"analises\dataset_binario_short_category.csv")
 app = Flask(__name__)
 @app.route('/add_text', methods=['POST'])
 def api_add_text():
@@ -105,7 +107,7 @@ def api_search_text():
             print(top_results)
 
            
-            if top_results[0]['degree_of_certainty'] > 0.93:
+            if top_results[0]['degree_of_certainty'] > 0.98:
                 category_name = top_results[0]["document"]
                 adjusted_category_name = category_mapper.map_category(category_name)
                 print(adjusted_category_name)
