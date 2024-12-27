@@ -12,7 +12,7 @@ class TextSimilarityAPI:
   
         self.chroma_settings = Settings(persist_directory=db_path, anonymized_telemetry=False)
 
-        self.embedding_model =  SentenceTransformer('SenhorDasMoscas/bert-ptbr-teste')
+        self.embedding_model =  SentenceTransformer('SenhorDasMoscas/acho-ptbr-e3-lr3e-05-27-12-2024')
         self.client = chromadb.PersistentClient(path=self.chroma_settings.persist_directory, settings=self.chroma_settings)
         self.collection = self.client.get_or_create_collection(name="text_similarity", metadata={"hnsw:space": "cosine"})
 
@@ -21,6 +21,7 @@ class TextSimilarityAPI:
 
     def add_text(self, text_id, text):
         text_clean = self.text_processor.preprocess(text)
+        print(f' texto limpo --> {text_clean}')
         embedding = self.embedding_model.encode([text_clean])[0]
         
         self.collection.add(
@@ -31,7 +32,9 @@ class TextSimilarityAPI:
         return text_clean
 
     def search_text(self, query, top_k):
-        query_embedding = self.embedding_model.encode([self.text_processor.preprocess(query)],convert_to_tensor=True)[0]
+        query_text = self.text_processor.preprocess(query)
+        print(query_text)
+        query_embedding = self.embedding_model.encode([query_text],convert_to_tensor=True)[0]
         results = self.collection.query(
             query_embeddings=[query_embedding.tolist()],
             n_results=top_k
@@ -58,7 +61,7 @@ class TextSimilarityAPI:
 
 category_mapper = CategoryMapper()
 text_similarity_api = TextSimilarityAPI(db_path="db_dir")
-text_similarity_api.bulk_add_texts(r"analises\dataset_binario_short_category.csv")
+#text_similarity_api.bulk_add_texts(r"analises\dataset_binario_short_category.csv")
 app = Flask(__name__)
 @app.route('/add_text', methods=['POST'])
 def api_add_text():
