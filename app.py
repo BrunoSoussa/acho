@@ -110,7 +110,7 @@ def api_search_text():
             print(top_results)
 
            
-            if top_results[0]['degree_of_certainty'] > 0.98:
+            if top_results[0]['degree_of_certainty'] > 0.93:
                 category_name = top_results[0]["document"]
                 adjusted_category_name = category_mapper.map_category(category_name)
                 print(adjusted_category_name)
