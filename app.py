@@ -94,7 +94,7 @@ def api_search_text():
     try:
         data = request.get_json()
         query = data['query']
-        top_k = data.get('top_k', 15)
+        top_k = data.get('top_k', 10)
 
         results = text_similarity_api.search_text(query, top_k)
 
