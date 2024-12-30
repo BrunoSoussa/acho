@@ -12,7 +12,7 @@ class TextSimilarityAPI:
   
         self.chroma_settings = Settings(persist_directory=db_path, anonymized_telemetry=False)
 
-        self.embedding_model =  SentenceTransformer('SenhorDasMoscas/acho-ptbr-e3-lr3e-05-27-12-2024')
+        self.embedding_model =  SentenceTransformer('SenhorDasMoscas/acho-ptbr-e4-lr3e-05-30-12-2024')
         self.client = chromadb.PersistentClient(path=self.chroma_settings.persist_directory, settings=self.chroma_settings)
         self.collection = self.client.get_or_create_collection(name="text_similarity", metadata={"hnsw:space": "cosine"})
 
@@ -130,10 +130,12 @@ def api_search_text():
             model = genai.GenerativeModel("gemini-1.5-flash")
             
             prompt = f"""
-            você é um modelo de detecção de intenção de compra, para essa intenção "{query}"
-            você recebeu as seguintes possibilidades {filtered_results}. 
-            Retorne um ID da categoria adequada em formato JSON, com uma única chave 'ID' e um valor sendo a categoria. 
-            Caso não encontre, retorne "None". Não inclua identificadores como ```json ```ou metadados extras.
+            Você é um modelo especializado em detecção de intenção de compra.  
+            A intenção do usuário é: "{query}".  
+            As categorias disponíveis são: {filtered_results}.  
+            Retorne o ID da categoria mais adequada em formato JSON, com uma única chave 'ID' e o valor correspondente à categoria.  
+            Se nenhuma categoria for apropriada, retorne "None".  
+            Não adicione formatação ou metadados extras.  
 
             """
             response = model.generate_content(prompt)
