@@ -28,6 +28,9 @@ class CategoryMapper:
     "produtos para pets e animais domésticos": "Pets",
     "doces e chocolates": "Doces",
     "presentes e viagens": "Viagens",
+    "serviços de desenvolvimento de software":"Desenv. Software",
+    "serviços na área da educação":"Serviço Educação"
+
 }
 
     def map_category(self, category_name):
