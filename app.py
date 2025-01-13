@@ -6,9 +6,11 @@ import google.generativeai as genai
 import json
 import os
 from dotenv import load_dotenv
+load_dotenv()
+
 GEMINI_KEY = os.getenv("GEMINI_KEY")
 MODEL_NAME = os.getenv("MODEL_NAME")
-load_dotenv()
+
 print(MODEL_NAME)
 
 
