@@ -2,6 +2,8 @@ import spacy
 from nltk.corpus import stopwords
 from unidecode import unidecode
 import nltk
+import re
+from unidecode import unidecode
 
 # Baixar stopwords para português, se necessário
 nltk.download("stopwords", quiet=True)
@@ -38,8 +40,7 @@ class TextPipeline:
             return ""
 
         text = unidecode(text.lower())  # Normaliza e remove acentos
-        doc = self.nlp(text)  # Tokeniza e analisa o texto
+        text = re.sub(r'[^a-zA-Z0-9\s]', '', text)
 
-        # Lematiza e remove stopwords e pontuações
-        tokens = [token.lemma_ for token in doc if token.text not in self.stop_words and not token.is_punct]
-        return " ".join(tokens)
+        return text.lower()
+

@@ -52,11 +52,17 @@ def api_search_text():
             logits = outputs.logits
             #predictions = torch.argmax(logits, dim=1).numpy()
             probabilities = torch.softmax(logits, dim=1)
-            values, indices = torch.topk(probabilities, 20, dim=1)
+            values, indices = torch.topk(probabilities, 10, dim=1)
+       
+        print(indices)
+        print(probabilities)
+
            
 
         rounded_values = [round(value.item(), 2) for value in values[0]]
+        print(rounded_values)
         top_labels = [id2label[idx.item()] for idx in indices[0]]
+       
         top_results = [
             {
                 "document": (
@@ -74,7 +80,7 @@ def api_search_text():
             for i in range(len(top_labels))
         ]
 
-       
+    
 
         if top_results[0]["degree_of_certainty"] >= 0.79:
             return jsonify(top_results[0]), 200
