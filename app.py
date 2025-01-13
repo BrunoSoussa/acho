@@ -22,7 +22,7 @@ text_processor = TextPipeline()
 
 
 id2label = model.config.id2label
-with open(r"data\maping_classes.json", "r", encoding="utf-8") as f:
+with open(r"data/maping_classes.json", "r", encoding="utf-8") as f:
     mapping_classes = json.load(f)
 
 
