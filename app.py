@@ -8,6 +8,7 @@ import os
 from dotenv import load_dotenv
 GEMINI_KEY = os.getenv("GEMINI_KEY")
 MODEL_NAME = os.getenv("MODEL_NAME")
+load_dotenv()
 
 app = Flask(__name__)
 
