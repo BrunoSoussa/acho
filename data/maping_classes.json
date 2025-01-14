@@ -4,18 +4,15 @@
   "ferramentas e equipamentos": {"Ferramentas": "2"},
   "brinquedos e jogos educativos": {"Brinquedos": "3"},
   "moveis": {"Móveis": "4"},
-  "consoles e jogos": {"Games": "5"},
   "moda e acessorios": {"Moda e Acessórios": "6"},
   "materiais de construcao": {"Material de Construção": "7"},
   "itens de colecao": {"Colecionáveis": "8"},
   "instrumentos musicais": {"Música": "9"},
-  "comidas rapidas e fastfood": {"Fast Food": "10"},
   "decoracao para festas": {"Festas": "11"},
   "eletronicos e gadgets": {"Eletrônicos": "12"},
   "veiculos automotores incluindo carros e motos": {"Veículos": "13"},
   "beleza e autocuidado": {"Beleza": "14"},
   "pecas e acessorios automotivos": {"Autopeças": "15"},
-  "produto alimenticio basico": {"Mercado": "16"},
   "itens para adultos como brinquedos sexuais": {"Sexshop": "17"},
   "fotografia": {"Fotografia": "18"},
   "eletrodomestico": {"Eletrodomésticos": "20"},
@@ -39,7 +36,19 @@
   "acougue": {"Açougue": "49"},
   "baterias automotivas": {"Baterias": "50"},
   "auto escola": {"Auto Escola": "51"},
-  "grafica": {"Gráfica": "52"}
+  "grafica": {"Gráfica": "52"},
+  "gas": {"Gás": "53"},
+  "agua": {"Agua": "54"},
+  "refrigeracao automotiva": {"Refrigeração Automotiva": "55"}, 
+  "salgados": {"Salgados": "56"},
+  "servico de dj": {"DJ": "57"},
+  "sushi": {"Sushi": "58"},
+  "locacao veicular": {"Locação Veicular": "59"},
+  "agencia de marketing": {"Agência de Marketing": "60"},
+  "troca de oleo": {"Troca de Oleo Automotiva": "61"}
+
  
   
 }
+
+
