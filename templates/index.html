@@ -118,9 +118,14 @@
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="examples-tab" data-bs-toggle="tab" data-bs-target="#examples" type="button" role="tab" aria-controls="examples" aria-selected="false">Exemplos</button>
             </li>
+            <!-- NOVA ABA: Sugestões -->
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="suggestions-tab" data-bs-toggle="tab" data-bs-target="#suggestions" type="button" role="tab" aria-controls="suggestions" aria-selected="false">Sugestões</button>
+            </li>
         </ul>
 
         <div class="tab-content" id="apiTabsContent">
+            <!-- TAB: Visão Geral -->
             <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview-tab">
                 <h2 class="mt-4">Visão Geral</h2>
                 <p>Essa API foi desenvolvida para processar e recuperar métricas de similaridade textual de forma eficiente, utilizando aprendizado de máquina e embeddings. Além disso, ela é capaz de integrar-se a modelos generativos avançados, como o <strong>Gemini</strong>, mas essa integração só ocorre quando o nosso modelo proprietário não está confiante nos resultados. Isso garante economia de custos e tempo, já que o Gemini possui um tempo de resposta extremamente alto.</p>
@@ -133,9 +138,9 @@
                     <li>Reduz a probabilidade de erros ao lidar com textos ambíguos ou pouco claros.</li>
                     <li>Oferece uma abordagem híbrida, combinando velocidade do modelo interno e a sofisticação do modelo generativo quando necessário.</li>
                 </ul>
-            
             </div>
 
+            <!-- TAB: Rotas -->
             <div class="tab-pane fade" id="routes" role="tabpanel" aria-labelledby="routes-tab">
                 <h2 class="mt-4">Rotas</h2>
                 <p>Abaixo está a lista de rotas disponíveis e suas descrições:</p>
@@ -151,6 +156,12 @@
                             <td><code>/search_text</code></td>
                             <td>Retorna métricas de certeza para os textos fornecidos.</td>
                         </tr>
+                        <!-- Se desejar, pode adicionar a rota de sugestões aqui, por exemplo:
+                        <tr>
+                            <td><code>/suggest_category</code></td>
+                            <td>Recebe uma sugestão de categoria e um token. Somente aprova se o token for válido.</td>
+                        </tr>
+                        -->
                     </tbody>
                 </table>
                 <ul>
@@ -185,42 +196,84 @@
                     <li>Acessórios para Pets (ID: 28)</li>
                     <li>Doces e Chocolates (ID: 29)</li>
                 </ul>
-                
             </div>
 
+            <!-- TAB: Exemplos -->
             <div class="tab-pane fade" id="examples" role="tabpanel" aria-labelledby="examples-tab">
                 <h2 class="mt-4">Exemplos</h2>
                 <h3>Exemplo de Retorno</h3>
                 <pre>
-    {
-        "document": "Instrumentos Musicais",
-        "id": "9",
-        "degree_of_certainty": 0.99
-    }
-                    </pre>
-                    <h3>Exemplo de Entrada</h3>
-                    <pre>
-    {
-        "query": "quero um honda civic 2018"
-    }
-                    </pre>
-                    <h3>Exemplo de Resposta</h3>
-                    <pre>
-    {
-        "document": "Veículos automotores incluindo carros e motos",
-        "id": "12",
-        "degree_of_certainty": 0.9478
-    }
-                    </pre>
-                </div>
+{
+    "document": "Instrumentos Musicais",
+    "id": "9",
+    "degree_of_certainty": 0.99
+}
+                </pre>
+                <h3>Exemplo de Entrada</h3>
+                <pre>
+{
+    "query": "quero um honda civic 2018"
+}
+                </pre>
+                <h3>Exemplo de Resposta</h3>
+                <pre>
+{
+    "document": "Veículos automotores incluindo carros e motos",
+    "id": "12",
+    "degree_of_certainty": 0.9478
+}
+                </pre>
+            </div>
+
+            <!-- NOVA TAB: Sugestões -->
+            <div class="tab-pane fade" id="suggestions" role="tabpanel" aria-labelledby="suggestions-tab">
+                <h2 class="mt-4">Sugestões de Categorias</h2>
+                <p>Aqui você pode enviar sugestões de novas categorias para a API. Para que a sugestão seja aprovada, você deve informar um token válido.</p>
+
+                <form>
+                    <div class="mb-3">
+                        <label for="suggestion-input" class="form-label">Sugestão de Categoria</label>
+                        <input type="text" class="form-control" id="suggestion-input" placeholder="Ex: Itens para Camping e Lazer ao Ar Livre">
+                    </div>
+                    <div class="mb-3">
+                        <label for="token-input" class="form-label">Token</label>
+                        <input type="text" class="form-control" id="token-input" placeholder="Insira aqui seu token de validação">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Enviar</button>
+                </form>
+                
+                <hr>
+                <h3>Como Funciona</h3>
+                <p>
+                    Quando você submete uma nova categoria, a API irá checar o seu token. 
+                    Caso seja válido, a sugestão segue para análise e, se aprovada, entrará para a lista de categorias. 
+                    Caso contrário, a sugestão será rejeitada.
+                </p>
+                <h3>Exemplo de Requisição</h3>
+                <pre>
+POST /suggest_category
+Content-Type: application/json
+
+{
+    "suggestion": "Itens para Camping e Lazer ao Ar Livre",
+    "token": "seu-token-aqui"
+}
+                </pre>
+                <h3>Exemplo de Resposta</h3>
+                <pre>
+{
+    "status": "aprovado",
+    "mensagem": "Sua sugestão foi encaminhada para análise."
+}
+                </pre>
             </div>
         </div>
-    
-        <footer>
-            <p>&copy; 2024 API Achô. Todos os direitos reservados.</p>
-        </footer>
-    
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    </body>
-    </html>
-    
+    </div>
+
+    <footer>
+        <p>&copy; 2024 API Achô. Todos os direitos reservados.</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
