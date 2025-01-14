@@ -45,9 +45,13 @@
   "sushi": {"Sushi": "58"},
   "locacao veicular": {"Locação Veicular": "59"},
   "agencia de marketing": {"Agência de Marketing": "60"},
+<<<<<<< HEAD
   "troca de oleo": {"Troca de Oleo Automotiva": "61"},
   "design de produtos": {"Design de Produtos": "62"},
   "consorcio": {"Consorcio": "63"}
+=======
+  "troca de oleo": {"Troca de Oleo Automotiva": "61"}
+>>>>>>> 2ed963ff3038f3f53236ebaa4a1a601eb60b690a
 
  
   
