@@ -47,7 +47,15 @@
   "agencia de marketing": {"Agência de Marketing": "60"},
   "troca de oleo": {"Troca de Oleo Automotiva": "61"},
   "design de produtos": {"Design de Produtos": "62"},
-  "consorcio": {"Consorcio": "63"}
+  "consorcio": {"Consorcio": "63"},
+  "construcao civil":{"Construção Civil": "64"},
+  "aluguel de imoveis":{"Aluguel de Imóveis":"65"},
+  "venda de imoveis":{"Vendas de Imóveis":"66"},
+  "hospedagem":{"hospedagem":"67"},
+  "servicos de seguros":{"Serviço de Seguros":"68"},
+  "geleia":{"Geleia":"69"}
+
+
 
 
 
