@@ -28,7 +28,6 @@
   "pizzaria": {"Pizzaria": "41"},
   "flores e plantas": {"Flores e Plantas": "42"},
   "servicos de desenvolvimento de software": {"Desenv. Software": "43"},
-  "servicos na area da educacao": {"Serviço Educação": "44"},
   "celulares e smartphones": {"Celulares e Smartphones": "45"},
   "servico de reparo de eletronicos": {"Serviço de reparo de Eletrônicos": "46"},
   "tintas": {"Tintas": "47"},
@@ -55,7 +54,11 @@
   "servicos de seguros":{"Serviço de Seguros":"68"},
   "geleia":{"Geleia":"69"},
   "assistencia tecnica em celulares":{"Assistência Têcnica em Celulares":"70"},
-  "assistencia tecnica em computadores":{"Assistência Têcnica em Computadores":"71"}
+  "assistencia tecnica em computadores":{"Assistência Têcnica em Computadores":"71"},
+  "equipamentos para panificacao":{"Equipamentos para panificação":"72"},
+  "ingredientes para panificacao":{"Ingredientes para Panificação":"73"},
+  "trabalhos cientificos":{"Trabalhos Ciêntificos":"74"}
+
 
 
 
