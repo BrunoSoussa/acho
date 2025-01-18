@@ -22,7 +22,7 @@
   "medicamentos": {"Medicamentos": "24"},
   "peixaria e pescados": {"Peixaria": "25"},
   "bebidas alcoolicas": {"Bebidas": "26"},
-  "padaria e confeitaria": {"Padaria e Confeitaria": "27"},
+  "paes": {"Pães": "27"},
   "produtos para pets e animais domesticos": {"Pets": "28"},
   "doces e chocolates": {"Chocolates": "29"},
   "pizzaria": {"Pizzaria": "41"},
@@ -57,7 +57,9 @@
   "assistencia tecnica em computadores":{"Assistência Têcnica em Computadores":"71"},
   "equipamentos para panificacao":{"Equipamentos para panificação":"72"},
   "ingredientes para panificacao":{"Ingredientes para Panificação":"73"},
-  "trabalhos cientificos":{"Trabalhos Ciêntificos":"74"}
+  "trabalhos cientificos":{"Trabalhos Ciêntificos":"74"},
+  "vidros":{"Vidros":"75"},
+  "barbearia":{"Barbearia":"76"}
 
 
 
