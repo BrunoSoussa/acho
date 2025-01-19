@@ -12,7 +12,7 @@
   "eletronicos e gadgets": {"Eletrônicos": "12"},
   "veiculos automotores incluindo carros e motos": {"Veículos": "13"},
   "beleza e autocuidado": {"Beleza": "14"},
-  "pecas e acessorios automotivos": {"Autopeças": "15"},
+
   "itens para adultos como brinquedos sexuais": {"Sexshop": "17"},
   "fotografia": {"Fotografia": "18"},
   "eletrodomestico": {"Eletrodomésticos": "20"},
@@ -59,7 +59,13 @@
   "ingredientes para panificacao":{"Ingredientes para Panificação":"73"},
   "trabalhos cientificos":{"Trabalhos Ciêntificos":"74"},
   "vidros":{"Vidros":"75"},
-  "barbearia":{"Barbearia":"76"}
+  "barbearia":{"Barbearia":"76"},
+  "autopecas para carros":{"Autopeças para Carros":"77"},
+  "autopecas para motos":{"Autopeças para motos":"78"},
+  "crossfit":{"Crossfit":"79"},
+  "sorveteria":{"Sorveteria":"80"},
+  "reforco escolar":{"Reforço Escolar":"81"},
+
 
 
 
