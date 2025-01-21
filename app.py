@@ -59,15 +59,14 @@ def api_search_text():
             probabilities = torch.softmax(logits, dim=1)
             values, indices = torch.topk(probabilities, 10, dim=1)
        
-        print(indices)
-        print(probabilities)
+      
 
            
 
         rounded_values = [round(value.item(), 2) for value in values[0]]
         print(rounded_values)
         top_labels = [id2label[idx.item()] for idx in indices[0]]
-       
+        print(top_labels)
         top_results = [
             {
                 "document": (
