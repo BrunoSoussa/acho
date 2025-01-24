@@ -10,9 +10,8 @@
   "instrumentos musicais": {"Música": "9"},
   "decoracao para festas": {"Festas": "11"},
   "eletronicos e gadgets": {"Eletrônicos": "12"},
-  "veiculos automotores incluindo carros e motos": {"Veículos": "13"},
+  "carros": {"Carros": "13"},
   "beleza e autocuidado": {"Beleza": "14"},
-
   "itens para adultos como brinquedos sexuais": {"Sexshop": "17"},
   "fotografia": {"Fotografia": "18"},
   "eletrodomesticos": {"Eletrodomésticos": "20"},
@@ -64,7 +63,8 @@
   "autopecas para motos":{"Autopeças para motos":"78"},
   "crossfit":{"Crossfit":"79"},
   "sorveteria":{"Sorveteria":"80"},
-  "reforco escolar":{"Reforço Escolar":"81"}
+  "reforco escolar":{"Reforço Escolar":"81"},
+  "motos":{"Motos":"82"}
 
 
 
