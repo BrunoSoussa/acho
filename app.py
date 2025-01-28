@@ -124,7 +124,7 @@ def api_search_text():
         ]
 
         # Salvar no banco se o grau de certeza for suficientemente alto
-        if top_results[0]["degree_of_certainty"] >= 0.79:
+        if top_results[0]["degree_of_certainty"] >= 0.9:
             save_to_db(query, top_results[0], top_results[0]["degree_of_certainty"])
             return jsonify(top_results[0]), 200
 
