@@ -22,7 +22,7 @@
   "peixaria e pescados": {"Peixaria": "25"},
   "bebidas alcoolicas": {"Bebidas": "26"},
   "paes": {"Pães": "27"},
-  "produtos para pets e animais domesticos": {"Pets": "28"},
+  
   "doces e chocolates": {"Chocolates": "29"},
   "pizzaria": {"Pizzaria": "41"},
   "flores e plantas": {"Flores e Plantas": "42"},
@@ -65,7 +65,14 @@
   "sorveteria":{"Sorveteria":"80"},
   "reforco escolar":{"Reforço Escolar":"81"},
   "motos":{"Motos":"82"},
-  "produtos para equinos":{"Produtos para Equinos":"83"}
+  "produtos para equinos":{"Produtos para Equinos":"83"},
+  "hamburgueres":{"Hamburgueres":"84"},
+  "servicos veterinarios":{"Servicos Veterinarios":"85"},
+  "acessorios para pets":{"Acessorios para Pets":"86"},
+  "racao para pets":{"Racao para Pets":"87"},
+  "cama mesa e banho":{"Cama, Mesa e Banho":"88"},
+  "espetinhos":{"Espetinhos":"89"},
+ 
 
 
 
