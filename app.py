@@ -140,7 +140,8 @@ def api_search_text():
         A intenção do usuário é: "{query}".
         As categorias disponíveis são: {filtered_results}.
         Retorne o ID da categoria mais adequada em formato JSON, com uma única chave 'ID' e o valor correspondente à categoria.
-        Se nenhuma categoria for apropriada, retorne "None".
+        Se nenhuma categoria for apropriada, retorne "None" nuncar retorne uma categoria que não não tiver nada relacionado
+        com intenção do usuário.
         Não adicione formatação ou metadados extras.
         """
         try:
