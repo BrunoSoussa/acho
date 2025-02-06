@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - API Achô</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            200: '#bbf7d0',
+                            300: '#86efac',
+                            400: '#4ade80',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-primary-50 font-[Inter]">
+    <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-md w-full space-y-8 bg-white p-8 rounded-lg shadow-lg">
+            <div>
+                <div class="flex justify-center">
+                    <svg class="h-12 w-12 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+                <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+                    API Achô
+                </h2>
+            </div>
+
+            <!-- Tabs -->
+            <div class="flex justify-center space-x-4 border-b">
+                <button onclick="switchTab('login')" 
+                        id="loginTab"
+                        class="py-2 px-4 border-b-2 font-medium text-sm focus:outline-none border-primary-500 text-primary-600">
+                    Login
+                </button>
+                <button onclick="switchTab('register')"
+                        id="registerTab" 
+                        class="py-2 px-4 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 focus:outline-none">
+                    Cadastro
+                </button>
+            </div>
+
+            <!-- Login Form -->
+            <form id="loginForm" class="mt-8 space-y-6">
+                <div class="rounded-md shadow-sm -space-y-px">
+                    <div>
+                        <label for="loginEmail" class="sr-only">Email</label>
+                        <input id="loginEmail" name="email" type="email" required 
+                               class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm" 
+                               placeholder="Email">
+                    </div>
+                    <div>
+                        <label for="loginPassword" class="sr-only">Senha</label>
+                        <input id="loginPassword" name="password" type="password" required 
+                               class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm" 
+                               placeholder="Senha">
+                    </div>
+                </div>
+
+                <!-- Admin Login Checkbox -->
+                <div class="flex items-center">
+                    <input type="checkbox" 
+                           id="adminLogin" 
+                           class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded">
+                    <label for="adminLogin" class="ml-2 block text-sm text-gray-900">
+                        Login como Administrador
+                    </label>
+                </div>
+
+                <!-- Admin Token Field (hidden by default) -->
+                <div id="adminTokenField" class="hidden">
+                    <label for="adminToken" class="block text-sm font-medium text-gray-700">Token de Admin</label>
+                    <input type="password" 
+                           id="adminToken" 
+                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                           placeholder="Digite o token de admin">
+                </div>
+
+                <div>
+                    <button type="submit" 
+                            class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                        Entrar
+                    </button>
+                </div>
+            </form>
+
+            <!-- Register Form -->
+            <form id="registerForm" class="mt-8 space-y-6 hidden">
+                <div class="rounded-md shadow-sm -space-y-px">
+                    <div>
+                        <label for="registerEmail" class="sr-only">Email</label>
+                        <input id="registerEmail" name="email" type="email" required 
+                               class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm" 
+                               placeholder="Email">
+                    </div>
+                    <div>
+                        <label for="registerPassword" class="sr-only">Senha</label>
+                        <input id="registerPassword" name="password" type="password" required 
+                               class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm" 
+                               placeholder="Senha">
+                    </div>
+                    <div>
+                        <label for="confirmPassword" class="sr-only">Confirmar Senha</label>
+                        <input id="confirmPassword" name="confirmPassword" type="password" required 
+                               class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm" 
+                               placeholder="Confirmar Senha">
+                    </div>
+                </div>
+
+                <div>
+                    <button type="submit" 
+                            class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                        Cadastrar
+                    </button>
+                </div>
+            </form>
+
+            <div id="error-message" class="hidden mt-2 text-center text-sm text-red-600">
+            </div>
+            <div id="success-message" class="hidden mt-2 text-center text-sm text-green-600">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tab) {
+            const loginForm = document.getElementById('loginForm');
+            const registerForm = document.getElementById('registerForm');
+            const loginTab = document.getElementById('loginTab');
+            const registerTab = document.getElementById('registerTab');
+            const errorMessage = document.getElementById('error-message');
+            const successMessage = document.getElementById('success-message');
+
+            errorMessage.classList.add('hidden');
+            successMessage.classList.add('hidden');
+
+            if (tab === 'login') {
+                loginForm.classList.remove('hidden');
+                registerForm.classList.add('hidden');
+                loginTab.classList.add('border-primary-500', 'text-primary-600');
+                loginTab.classList.remove('border-transparent', 'text-gray-500');
+                registerTab.classList.remove('border-primary-500', 'text-primary-600');
+                registerTab.classList.add('border-transparent', 'text-gray-500');
+            } else {
+                loginForm.classList.add('hidden');
+                registerForm.classList.remove('hidden');
+                registerTab.classList.add('border-primary-500', 'text-primary-600');
+                registerTab.classList.remove('border-transparent', 'text-gray-500');
+                loginTab.classList.remove('border-primary-500', 'text-primary-600');
+                loginTab.classList.add('border-transparent', 'text-gray-500');
+            }
+        }
+
+        // Toggle Admin Token Field
+        document.getElementById('adminLogin').addEventListener('change', function(e) {
+            const adminTokenField = document.getElementById('adminTokenField');
+            adminTokenField.classList.toggle('hidden', !e.target.checked);
+        });
+
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const isAdmin = document.getElementById('adminLogin').checked;
+            const adminToken = document.getElementById('adminToken').value;
+            const errorMessage = document.getElementById('error-message');
+            
+            try {
+                const headers = {
+                    'Content-Type': 'application/json'
+                };
+                
+                if (isAdmin && adminToken) {
+                    headers['X-Admin-Token'] = adminToken;
+                }
+                
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: headers,
+                    credentials: 'same-origin',
+                    body: JSON.stringify({ 
+                        email, 
+                        password,
+                        is_admin: isAdmin
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    window.location.href = '/';
+                } else {
+                    errorMessage.textContent = data.message || 'Erro ao fazer login';
+                    errorMessage.classList.remove('hidden');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                errorMessage.textContent = 'Erro ao conectar com o servidor';
+                errorMessage.classList.remove('hidden');
+            }
+        });
+
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const errorMessage = document.getElementById('error-message');
+            const successMessage = document.getElementById('success-message');
+
+            if (password !== confirmPassword) {
+                errorMessage.textContent = 'As senhas não coincidem';
+                errorMessage.classList.remove('hidden');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                if (response.ok) {
+                    successMessage.textContent = 'Cadastro realizado com sucesso! Você já pode fazer login.';
+                    successMessage.classList.remove('hidden');
+                    errorMessage.classList.add('hidden');
+                    document.getElementById('registerForm').reset();
+                    setTimeout(() => switchTab('login'), 2000);
+                } else {
+                    const error = await response.json();
+                    errorMessage.textContent = error.message;
+                    errorMessage.classList.remove('hidden');
+                    successMessage.classList.add('hidden');
+                }
+            } catch (error) {
+                errorMessage.textContent = 'Erro ao conectar com o servidor';
+                errorMessage.classList.remove('hidden');
+                successMessage.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html> 

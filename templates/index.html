@@ -4,276 +4,1237 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Documentação da API Achô</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg-gradient: linear-gradient(135deg, #f8f9fa, #e9ecef);
-            --accent-color: #6610f2;
-            --text-color: #343a40;
-            --light-text-color: #6c757d;
-            --card-bg: #ffffff;
-            --card-border: #dee2e6;
-            --shadow: rgba(0, 0, 0, 0.1) 0px 4px 6px;
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Heroicons -->
+    <script src="https://unpkg.com/@heroicons/react@2.0.18/24/solid"></script>
+    <!-- Alpine.js -->
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            200: '#bbf7d0',
+                            300: '#86efac',
+                            400: '#4ade80',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                        }
+                    }
+                }
+            }
         }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background: var(--bg-gradient);
-            color: var(--text-color);
-            line-height: 1.6;
-        }
-
-        header {
-            background-color: var(--card-bg);
-            border-bottom: 1px solid var(--card-border);
-            padding: 20px;
-            box-shadow: var(--shadow);
-            position: sticky;
-            top: 0;
-            z-index: 1030;
-        }
-
-        header h1 {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--accent-color);
-            margin: 0;
-        }
-
-        .container {
-            max-width: 900px;
-            margin: 40px auto;
-        }
-
-        .tab-content {
-            margin-top: 20px;
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: var(--shadow);
-        }
-
-        .nav-tabs .nav-link.active {
-            background-color: var(--accent-color);
-            color: #fff;
-            border: none;
-        }
-
-        .nav-tabs .nav-link {
-            color: var(--text-color);
-            border: 1px solid var(--card-border);
-            border-radius: 8px;
-            margin-right: 5px;
-        }
-
-        .table {
-            border: 1px solid var(--card-border);
-        }
-
-        .table th {
-            background-color: var(--accent-color);
-            color: #fff;
-            border: none;
-        }
-
-        .table td {
-            color: var(--text-color);
-        }
-
-        pre {
-            background-color: #f8f9fa;
-            color: var(--text-color);
-            padding: 15px;
-            border-radius: 8px;
-            border: 1px solid var(--card-border);
-        }
-
-        footer {
-            text-align: center;
-            margin-top: 40px;
-            font-size: 0.9rem;
-            color: var(--light-text-color);
-        }
-    </style>
+    </script>
 </head>
-<body>
-    <header>
-        <div class="container">
-            <h1>API Achô</h1>
-        </div>
+<body class="bg-primary-50 font-[Inter]">
+    <!-- Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center">
+                    <svg class="h-8 w-8 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <h1 class="ml-2 text-2xl font-bold text-gray-900">API Achô</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="/logout" 
+                       class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                        Sair
+                    </a>
+                </div>
+            </div>
+        </nav>
     </header>
 
-    <div class="container">
-        <p class="text-center text-muted">Uma API moderna e poderosa para categorização versão <strong>1.0.1</strong>.</p>
-
-        <ul class="nav nav-tabs" id="apiTabs" role="tablist">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab" aria-controls="overview" aria-selected="true">Visão Geral</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="routes-tab" data-bs-toggle="tab" data-bs-target="#routes" type="button" role="tab" aria-controls="routes" aria-selected="false">Rotas</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="examples-tab" data-bs-toggle="tab" data-bs-target="#examples" type="button" role="tab" aria-controls="examples" aria-selected="false">Exemplos</button>
-            </li>
-            <!-- NOVA ABA: Sugestões -->
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="suggestions-tab" data-bs-toggle="tab" data-bs-target="#suggestions" type="button" role="tab" aria-controls="suggestions" aria-selected="false">Sugestões</button>
-            </li>
-        </ul>
-
-        <div class="tab-content" id="apiTabsContent">
-            <!-- TAB: Visão Geral -->
-            <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview-tab">
-                <h2 class="mt-4">Visão Geral</h2>
-                <p>Essa API foi desenvolvida para processar e recuperar métricas de similaridade textual de forma eficiente, utilizando aprendizado de máquina e embeddings. Além disso, ela é capaz de integrar-se a modelos generativos avançados, como o <strong>Gemini</strong>, mas essa integração só ocorre quando o nosso modelo proprietário não está confiante nos resultados. Isso garante economia de custos e tempo, já que o Gemini possui um tempo de resposta extremamente alto.</p>
-
-                <p><strong>Nosso modelo interno foi treinado com mais de 12 mil pares de dados, garantindo um desempenho consistente e eficaz em diversos cenários.</strong> Ele está em constante evolução, sendo atualizado regularmente com novos dados para aumentar sua precisão e abrangência. </p>
-
-                <p><strong>Benefícios da integração com o Gemini:</strong></p>
-                <ul>
-                    <li>Garante alta precisão em cenários mais complexos.</li>
-                    <li>Reduz a probabilidade de erros ao lidar com textos ambíguos ou pouco claros.</li>
-                    <li>Oferece uma abordagem híbrida, combinando velocidade do modelo interno e a sofisticação do modelo generativo quando necessário.</li>
-                </ul>
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div x-data="tabsData" class="space-y-6">
+            <!-- Navegação das tabs -->
+            <div class="border-b border-gray-200">
+                <nav class="-mb-px flex space-x-8">
+                    <button @click="activeTab = 'overview'"
+                            :class="{ 'border-primary-500 text-primary-600': activeTab === 'overview' }"
+                            class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                        Visão Geral
+                    </button>
+                    <button @click="activeTab = 'dashboard'"
+                            :class="{ 'border-primary-500 text-primary-600': activeTab === 'dashboard' }"
+                            class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                        Dashboard
+                    </button>
+                    <button @click="activeTab = 'test-search'"
+                            :class="{ 'border-primary-500 text-primary-600': activeTab === 'test-search' }"
+                            class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                        Testar Busca
+                    </button>
+                    <button @click="activeTab = 'examples-by-category'"
+                            :class="{ 'border-primary-500 text-primary-600': activeTab === 'examples-by-category' }"
+                            class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                        Exemplos por Categoria
+                    </button>
+                    <button @click="activeTab = 'suggestions'"
+                            :class="{ 'border-primary-500 text-primary-600': activeTab === 'suggestions' }"
+                            class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                        Sugestões
+                    </button>
+                    <button @click="activeTab = 'database'"
+                            :class="{ 'border-primary-500 text-primary-600': activeTab === 'database' }"
+                            class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                        <span class="flex items-center">
+                            <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"/>
+                            </svg>
+                            Banco de Dados
+                        </span>
+                    </button>
+                </nav>
             </div>
 
-            <!-- TAB: Rotas -->
-            <div class="tab-pane fade" id="routes" role="tabpanel" aria-labelledby="routes-tab">
-                <h2 class="mt-4">Rotas</h2>
-                <p>Abaixo está a lista de rotas disponíveis e suas descrições:</p>
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Rota</th>
-                            <th>Descrição</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><code>/search_text</code></td>
-                            <td>Retorna métricas de certeza para os textos fornecidos.</td>
-                        </tr>
-                        <!-- Se desejar, pode adicionar a rota de sugestões aqui, por exemplo:
-                        <tr>
-                            <td><code>/suggest_category</code></td>
-                            <td>Recebe uma sugestão de categoria e um token. Somente aprova se o token for válido.</td>
-                        </tr>
-                        -->
-                    </tbody>
-                </table>
-                <ul>
-                    <li>Óculos e itens para óculos (ID: 0)</li>
-                    <li>Papelaria e Escritório (ID: 1)</li>
-                    <li>Ferramentas e Equipamentos (ID: 2)</li>
-                    <li>Brinquedos e Jogos Educativos (ID: 3)</li>
-                    <li>Casa e Decoração (ID: 4)</li>
-                    <li>Consoles e Jogos (ID: 5)</li>
-                    <li>Moda e Acessórios (ID: 6)</li>
-                    <li>Materiais de Construção (ID: 7)</li>
-                    <li>Itens de Coleção (ID: 8)</li>
-                    <li>Instrumentos Musicais (ID: 9)</li>
-                    <li>Comidas rápidas e fastfood (ID: 10)</li>
-                    <li>Decoração para Festas (ID: 11)</li>
-                    <li>Eletrônicos e Gadgets (ID: 12)</li>
-                    <li>Veículos automotores incluindo carros e motos (ID: 13)</li>
-                    <li>Beleza e Autocuidado (ID: 14)</li>
-                    <li>Peças e Acessórios Automotivos (ID: 15)</li>
-                    <li>Produtos Alimentícios Básicos (ID: 16)</li>
-                    <li>Itens para Adultos como brinquedos sexuais (ID: 17)</li>
-                    <li>Fotografia (ID: 18)</li>
-                    <li>Presentes e Viagens (ID: 19)</li>
-                    <li>Eletrodomésticos (ID: 20)</li>
-                    <li>Joias e bijuterias (ID: 21)</li>
-                    <li>Livros e Materiais Literários (ID: 22)</li>
-                    <li>Esportes e Fitness (ID: 23)</li>
-                    <li>Saúde e Bem-Estar (ID: 24)</li>
-                    <li>Peixaria e Pescados (ID: 25)</li>
-                    <li>Bebidas Alcoólicas (ID: 26)</li>
-                    <li>Padaria e Confeitaria (ID: 27)</li>
-                    <li>Acessórios para Pets (ID: 28)</li>
-                    <li>Doces e Chocolates (ID: 29)</li>
-                </ul>
-            </div>
-
-            <!-- TAB: Exemplos -->
-            <div class="tab-pane fade" id="examples" role="tabpanel" aria-labelledby="examples-tab">
-                <h2 class="mt-4">Exemplos</h2>
-                <h3>Exemplo de Retorno</h3>
-                <pre>
-{
-    "document": "Instrumentos Musicais",
-    "id": "9",
-    "degree_of_certainty": 0.99
-}
-                </pre>
-                <h3>Exemplo de Entrada</h3>
-                <pre>
-{
-    "query": "quero um honda civic 2018"
-}
-                </pre>
-                <h3>Exemplo de Resposta</h3>
-                <pre>
-{
-    "document": "Veículos automotores incluindo carros e motos",
-    "id": "12",
-    "degree_of_certainty": 0.9478
-}
-                </pre>
-            </div>
-
-            <!-- NOVA TAB: Sugestões -->
-            <div class="tab-pane fade" id="suggestions" role="tabpanel" aria-labelledby="suggestions-tab">
-                <h2 class="mt-4">Sugestões de Categorias</h2>
-                <p>Aqui você pode enviar sugestões de novas categorias para a API. Para que a sugestão seja aprovada, você deve informar um token válido.</p>
-
-                <form>
-                    <div class="mb-3">
-                        <label for="suggestion-input" class="form-label">Sugestão de Categoria</label>
-                        <input type="text" class="form-control" id="suggestion-input" placeholder="Ex: Itens para Camping e Lazer ao Ar Livre">
+            <!-- Conteúdo das tabs -->
+            <div class="bg-white shadow rounded-lg p-6">
+                <div x-show="activeTab === 'overview'" class="space-y-8">
+                    <h2 class="text-2xl font-bold text-gray-900">Visão Geral</h2>
+                    
+                    <!-- Descrição -->
+                    <div class="prose max-w-none">
+                        <p class="text-gray-600">
+                            Essa API foi desenvolvida para processar e recuperar métricas de similaridade textual de forma eficiente, 
+                            utilizando aprendizado de máquina e embeddings. Além disso, ela é capaz de integrar-se a modelos 
+                            generativos avançados, como o <span class="font-semibold">Gemini</span>.
+                        </p>
                     </div>
-                    <div class="mb-3">
-                        <label for="token-input" class="form-label">Token</label>
-                        <input type="text" class="form-control" id="token-input" placeholder="Insira aqui seu token de validação">
+
+                    <!-- Benefícios -->
+                    <div class="bg-primary-50 rounded-lg p-6 border border-primary-200">
+                        <h3 class="font-semibold text-primary-700 mb-4">Benefícios da integração com o Gemini:</h3>
+                        <ul class="space-y-3 text-primary-600">
+                            <li class="flex items-center">
+                                <svg class="h-5 w-5 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                </svg>
+                                <span>Garante alta precisão em cenários mais complexos</span>
+                            </li>
+                            <li class="flex items-center">
+                                <svg class="h-5 w-5 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                </svg>
+                                <span>Reduz a probabilidade de erros ao lidar com textos ambíguos</span>
+                            </li>
+                            <li class="flex items-center">
+                                <svg class="h-5 w-5 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                </svg>
+                                <span>Oferece uma abordagem híbrida e eficiente</span>
+                            </li>
+                        </ul>
                     </div>
-                    <button type="submit" class="btn btn-primary">Enviar</button>
-                </form>
-                
-                <hr>
-                <h3>Como Funciona</h3>
-                <p>
-                    Quando você submete uma nova categoria, a API irá checar o seu token. 
-                    Caso seja válido, a sugestão segue para análise e, se aprovada, entrará para a lista de categorias. 
-                    Caso contrário, a sugestão será rejeitada.
-                </p>
-                <h3>Exemplo de Requisição</h3>
-                <pre>
-POST /suggest_category
+
+                    <!-- Exemplo de Uso -->
+                    <div class="space-y-4">
+                        <h3 class="text-lg font-semibold text-gray-900">Exemplo de Uso</h3>
+                        
+                        <!-- Request -->
+                        <div class="space-y-2">
+                            <h4 class="text-sm font-medium text-gray-700">Request:</h4>
+                            <div class="bg-gray-900 rounded-lg p-4 overflow-x-auto">
+                                <pre class="text-green-400 text-sm">POST /search_text
 Content-Type: application/json
 
 {
-    "suggestion": "Itens para Camping e Lazer ao Ar Livre",
-    "token": "seu-token-aqui"
-}
-                </pre>
-                <h3>Exemplo de Resposta</h3>
-                <pre>
-{
-    "status": "aprovado",
-    "mensagem": "Sua sugestão foi encaminhada para análise."
-}
-                </pre>
+    "query": "Preciso de um banho e tosa para meu cachorro"
+}</pre>
+                            </div>
+                        </div>
+
+                        <!-- Response -->
+                        <div class="space-y-2">
+                            <h4 class="text-sm font-medium text-gray-700">Response:</h4>
+                            <div class="bg-gray-900 rounded-lg p-4 overflow-x-auto">
+                                <pre class="text-green-400 text-sm">{
+    "document": "Serviços para animais de estimação",
+    "degree_of_certainty": 0.95,
+    "id": "8"
+}</pre>
+                            </div>
+                        </div>
+
+                        <!-- Explicação -->
+                        <div class="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-lg">
+                            <div class="flex">
+                                <div class="flex-shrink-0">
+                                    <svg class="h-5 w-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-sm text-blue-700">
+                                        O grau de certeza (degree_of_certainty) varia de 0 a 1, onde valores mais próximos de 1 indicam maior confiança na classificação.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div x-show="activeTab === 'dashboard'">
+                    <!-- Conteúdo do Dashboard -->
+                    <h2 class="text-2xl font-bold text-gray-900">Dashboard de Pesquisas</h2>
+                    
+                    <!-- Cards de Métricas -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden group hover:shadow-md transition-all duration-200">
+                            <div class="p-6">
+                                <div class="flex items-center">
+                                    <div class="bg-primary-50 rounded-lg p-3">
+                                        <svg class="h-6 w-6 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                                        </svg>
+                                    </div>
+                                    <div class="ml-4">
+                                        <h3 class="text-sm font-medium text-gray-500">Total de Pesquisas</h3>
+                                        <p class="mt-2 text-3xl font-bold text-gray-900" id="totalSearches">0</p>
+                                    </div>
+                                </div>
+                                <div class="mt-4">
+                                    <div class="w-full bg-gray-100 rounded-full h-1">
+                                        <div class="bg-primary-500 h-1 rounded-full group-hover:bg-primary-600 transition-all duration-200" style="width: 75%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden group hover:shadow-md transition-all duration-200">
+                            <div class="p-6">
+                                <div class="flex items-center">
+                                    <div class="bg-primary-50 rounded-lg p-3">
+                                        <svg class="h-6 w-6 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                                        </svg>
+                                    </div>
+                                    <div class="ml-4">
+                                        <h3 class="text-sm font-medium text-gray-500">Média de Certeza</h3>
+                                        <p class="mt-2 text-3xl font-bold text-gray-900" id="avgCertainty">0%</p>
+                                    </div>
+                                </div>
+                                <div class="mt-4">
+                                    <div class="w-full bg-gray-100 rounded-full h-1">
+                                        <div class="bg-primary-500 h-1 rounded-full group-hover:bg-primary-600 transition-all duration-200" style="width: 75%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden group hover:shadow-md transition-all duration-200">
+                            <div class="p-6">
+                                <div class="flex items-center">
+                                    <div class="bg-primary-50 rounded-lg p-3">
+                                        <svg class="h-6 w-6 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                                        </svg>
+                                    </div>
+                                    <div class="ml-4">
+                                        <h3 class="text-sm font-medium text-gray-500">Categorias Únicas</h3>
+                                        <p class="mt-2 text-3xl font-bold text-gray-900" id="uniqueCategories">0</p>
+                                    </div>
+                                </div>
+                                <div class="mt-4">
+                                    <div class="w-full bg-gray-100 rounded-full h-1">
+                                        <div class="bg-primary-500 h-1 rounded-full group-hover:bg-primary-600 transition-all duration-200" style="width: 75%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Gráfico e Lista -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- Top Categorias -->
+                        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                            <h3 class="text-lg font-medium text-gray-900 mb-4">Top 10 Categorias</h3>
+                            <div class="space-y-4" id="topCategories"></div>
+                        </div>
+                        
+                        <!-- Pesquisas Recentes -->
+                        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                            <h3 class="text-lg font-medium text-gray-900 mb-4">Pesquisas Recentes</h3>
+                            <div class="space-y-4" id="recentSearches"></div>
+                        </div>
+                    </div>
+                </div>
+                <div x-show="activeTab === 'test-search'" class="space-y-6">
+                    <h2 class="text-2xl font-bold text-gray-900">Testar Busca de Texto</h2>
+                    
+                    <!-- Formulário de Teste -->
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                        <div class="p-6">
+                            <form id="searchTestForm" class="space-y-4">
+                                <div class="relative">
+                                    <label for="searchQuery" class="block text-sm font-medium text-gray-700 mb-2">
+                                        Digite o texto para busca
+                                    </label>
+                                    <div class="relative">
+                                        <input type="text" 
+                                               id="searchQuery" 
+                                               class="block w-full pl-10 pr-4 py-3 border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200"
+                                               placeholder="Ex: preciso de um banho e tosa para meu cachorro">
+                                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                            <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button type="submit" 
+                                        class="w-full sm:w-auto inline-flex justify-center items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-gradient-to-r from-primary-600 to-primary-500 hover:from-primary-700 hover:to-primary-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all duration-200 shadow-sm hover:shadow-md">
+                                    <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                                    </svg>
+                                    Buscar
+                                </button>
+                            </form>
+
+                            <!-- Loading State (novo posicionamento e estilo) -->
+                            <div id="searchLoading" class="hidden">
+                                <div class="mt-4 flex items-center justify-center p-4 bg-white/80 backdrop-blur-sm rounded-lg border border-gray-200">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="relative">
+                                            <div class="w-8 h-8">
+                                                <div class="absolute top-0 left-0 w-full h-full">
+                                                    <div class="w-8 h-8 rounded-full absolute border-4 border-solid border-gray-200"></div>
+                                                    <div class="w-8 h-8 rounded-full animate-spin absolute border-4 border-solid border-primary-500 border-t-transparent shadow-sm"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="flex flex-col">
+                                            <span class="text-sm font-medium text-gray-900">Processando busca</span>
+                                            <span class="text-xs text-gray-500">Aguarde um momento...</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Resultado da Busca -->
+                            <div id="searchResult" class="mt-6 hidden">
+                                <h3 class="text-lg font-medium text-gray-900 mb-4">Resultado</h3>
+                                <div class="bg-white rounded-lg p-4 border border-gray-200">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <span class="text-sm font-medium text-gray-700">Categoria:</span>
+                                        <span id="resultCategory" class="text-sm font-semibold text-gray-900"></span>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-sm font-medium text-gray-700">Grau de Certeza:</span>
+                                        <span id="resultCertainty" class="px-2 py-1 text-xs font-medium rounded-full"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Histórico de Buscas -->
+                            <div class="mt-8">
+                                <h3 class="text-lg font-medium text-gray-900 mb-4">Histórico de Buscas</h3>
+                                <div id="searchHistory" class="space-y-3">
+                                    <!-- O histórico será inserido aqui dinamicamente -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div x-show="activeTab === 'examples-by-category'" class="space-y-6">
+                    <h2 class="text-2xl font-bold text-gray-900">Exemplos por Categoria</h2>
+                    
+                    <!-- Loading State -->
+                    <div id="examplesLoading" class="hidden">
+                        <div class="flex items-center justify-center p-4 bg-white/80 backdrop-blur-sm rounded-lg border border-gray-200">
+                            <div class="flex items-center space-x-3">
+                                <div class="animate-spin rounded-full h-8 w-8 border-4 border-primary-500 border-t-transparent"></div>
+                                <span class="text-sm text-gray-500">Carregando exemplos...</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Container para os exemplos -->
+                    <div id="categoryExamples" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Os exemplos serão inseridos aqui dinamicamente -->
+                    </div>
+                </div>
+                <div x-show="activeTab === 'suggestions'" class="space-y-8">
+                    <h2 class="text-2xl font-bold text-gray-900">Sugestões de Categorias</h2>
+                    
+                    <!-- Formulário de Sugestão -->
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                        <h3 class="text-lg font-semibold text-gray-700 mb-4">Nova Sugestão</h3>
+                        <form id="suggestionForm" class="space-y-4">
+                            <div>
+                                <label for="suggestion" class="block text-sm font-medium text-gray-700">
+                                    Nova Categoria
+                                </label>
+                                <input type="text" 
+                                       id="suggestion" 
+                                       class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                                       placeholder="Ex: Itens para Camping e Lazer ao Ar Livre">
+                            </div>
+                            <button type="submit" 
+                                    class="inline-flex justify-center items-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                                <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                                </svg>
+                                Enviar Sugestão
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Minhas Sugestões -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Sugestões Pendentes -->
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                            <div class="flex items-center space-x-2 mb-4">
+                                <div class="w-2 h-2 bg-yellow-400 rounded-full"></div>
+                                <h3 class="text-lg font-semibold text-gray-700">Pendentes</h3>
+                            </div>
+                            <div id="pendingSuggestions" class="space-y-4">
+                                <!-- Sugestões pendentes serão inseridas aqui -->
+                            </div>
+                        </div>
+
+                        <!-- Sugestões Aprovadas -->
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                            <div class="flex items-center space-x-2 mb-4">
+                                <div class="w-2 h-2 bg-green-400 rounded-full"></div>
+                                <h3 class="text-lg font-semibold text-gray-700">Aprovadas</h3>
+                            </div>
+                            <div id="approvedSuggestions" class="space-y-4">
+                                <!-- Sugestões aprovadas serão inseridas aqui -->
+                            </div>
+                        </div>
+
+                        <!-- Sugestões Rejeitadas -->
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                            <div class="flex items-center space-x-2 mb-4">
+                                <div class="w-2 h-2 bg-red-400 rounded-full"></div>
+                                <h3 class="text-lg font-semibold text-gray-700">Não Aceitas</h3>
+                            </div>
+                            <div id="rejectedSuggestions" class="space-y-4">
+                                <!-- Sugestões rejeitadas serão inseridas aqui -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Painel de Admin -->
+                    <div id="adminPanel" class="hidden space-y-6 mt-8">
+                        <h3 class="text-xl font-bold text-gray-900">Painel Administrativo</h3>
+                        
+                        <!-- Filtros -->
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                            <div class="flex flex-wrap gap-4">
+                                <div class="flex-1">
+                                    <label for="userFilter" class="block text-sm font-medium text-gray-700 mb-2">
+                                        Filtrar por Usuário
+                                    </label>
+                                    <select id="userFilter" 
+                                            class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500">
+                                        <option value="">Todos os usuários</option>
+                                        <!-- Usuários serão inseridos aqui -->
+                                    </select>
+                                </div>
+                                <div class="flex-1">
+                                    <label for="statusFilter" class="block text-sm font-medium text-gray-700 mb-2">
+                                        Status
+                                    </label>
+                                    <select id="statusFilter" 
+                                            class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500">
+                                        <option value="">Todos os status</option>
+                                        <option value="pending">Pendentes</option>
+                                        <option value="approved">Aprovadas</option>
+                                        <option value="rejected">Rejeitadas</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Lista de Sugestões do Admin -->
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                            <div id="adminSuggestionsList" class="space-y-4">
+                                <!-- Sugestões serão inseridas aqui -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div x-show="activeTab === 'database'" class="space-y-6">
+                    <h2 class="text-2xl font-bold text-gray-900">Visualização do Banco de Dados</h2>
+                    
+                    <!-- Seletor de Tabelas -->
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                        <div class="flex items-center space-x-4">
+                            <label for="tableSelect" class="block text-sm font-medium text-gray-700">
+                                Selecione a Tabela:
+                            </label>
+                            <select id="tableSelect" 
+                                    class="block w-64 rounded-lg border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500">
+                                <option value="query_response">Histórico de Buscas</option>
+                                <option value="users">Usuários</option>
+                                <option value="suggestions">Sugestões</option>
+                            </select>
+                            <button onclick="loadTableData()" 
+                                    class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all duration-200">
+                                <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                                </svg>
+                                Atualizar
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Loading State -->
+                    <div id="tableLoading" class="hidden">
+                        <div class="flex items-center justify-center p-4">
+                            <div class="flex items-center space-x-3">
+                                <div class="animate-spin rounded-full h-8 w-8 border-4 border-primary-500 border-t-transparent"></div>
+                                <span class="text-sm text-gray-500">Carregando dados...</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Tabela de Dados -->
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead id="tableHeader" class="bg-gray-50">
+                                    <!-- Cabeçalhos serão inseridos aqui -->
+                                </thead>
+                                <tbody id="tableBody" class="bg-white divide-y divide-gray-200">
+                                    <!-- Dados serão inseridos aqui -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
+    </main>
 
-    <footer>
-        <p>&copy; 2024 API Achô. Todos os direitos reservados.</p>
+    <footer class="bg-white mt-12 border-t border-gray-200">
+        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+            <p class="text-center text-sm text-gray-500">
+                &copy; 2024 API Achô. Todos os direitos reservados.
+            </p>
+        </div>
     </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Função para verificar autenticação
+        async function checkAuth() {
+            try {
+                const response = await fetch('/api/check-auth', {
+                    credentials: 'same-origin'
+                });
+                if (!response.ok) {
+                    window.location.href = '/login';
+                }
+            } catch (error) {
+                console.error('Erro ao verificar autenticação:', error);
+                window.location.href = '/login';
+            }
+        }
+
+        // Verificar autenticação periodicamente
+        setInterval(checkAuth, 60000); // Verifica a cada minuto
+
+        // Função para carregar sugestões
+        async function loadSuggestions() {
+            try {
+                const response = await fetch('/api/suggestions', {
+                    credentials: 'same-origin'
+                });
+                const suggestions = await response.json();
+                
+                // Elementos do DOM
+                const pendingDiv = document.getElementById('pendingSuggestions');
+                const approvedDiv = document.getElementById('approvedSuggestions');
+                const rejectedDiv = document.getElementById('rejectedSuggestions');
+                const adminPanel = document.getElementById('adminPanel');
+                const adminList = document.getElementById('adminSuggestionsList');
+                const userFilter = document.getElementById('userFilter');
+                const statusFilter = document.getElementById('statusFilter');
+                
+                // Limpar containers
+                pendingDiv.innerHTML = '';
+                approvedDiv.innerHTML = '';
+                rejectedDiv.innerHTML = '';
+                adminList.innerHTML = '';
+                
+                // Separar sugestões por status
+                const userSuggestions = suggestions.filter(s => !s.user_email);
+                const adminSuggestions = suggestions.filter(s => s.user_email);
+                
+                // Preencher sugestões do usuário
+                userSuggestions.forEach(suggestion => {
+                    const targetDiv = suggestion.status === 'pending' ? pendingDiv :
+                                    suggestion.status === 'approved' ? approvedDiv :
+                                    rejectedDiv;
+                    
+                    targetDiv.appendChild(createSuggestionElement(suggestion, false));
+                });
+                
+                // Atualizar painel de admin
+                if (adminSuggestions.length > 0) {
+                    adminPanel.classList.remove('hidden');
+                    
+                    // Coletar usuários únicos para o filtro
+                    const users = [...new Set(adminSuggestions.map(s => s.user_email))].sort();
+                    userFilter.innerHTML = `
+                        <option value="">Todos os usuários</option>
+                        ${users.map(user => `<option value="${user}">${user}</option>`).join('')}
+                    `;
+                    
+                    // Aplicar filtros atuais
+                    const selectedUser = userFilter.value;
+                    const selectedStatus = statusFilter.value;
+                    
+                    // Filtrar sugestões
+                    let filteredSuggestions = [...adminSuggestions]; // Criar uma cópia do array
+                    
+                    // Aplicar filtro de usuário
+                    if (selectedUser) {
+                        console.log('Filtrando por usuário:', selectedUser);
+                        filteredSuggestions = filteredSuggestions.filter(s => s.user_email === selectedUser);
+                    }
+                    
+                    // Aplicar filtro de status
+                    if (selectedStatus) {
+                        console.log('Filtrando por status:', selectedStatus);
+                        filteredSuggestions = filteredSuggestions.filter(s => s.status === selectedStatus);
+                    }
+                    
+                    // Ordenar por data (mais recentes primeiro)
+                    filteredSuggestions.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+                    
+                    // Limpar painéis antes de adicionar as sugestões filtradas
+                    pendingDiv.innerHTML = '';
+                    approvedDiv.innerHTML = '';
+                    rejectedDiv.innerHTML = '';
+                    adminList.innerHTML = '';
+                    
+                    // Distribuir sugestões filtradas nos painéis apropriados
+                    filteredSuggestions.forEach(suggestion => {
+                        // Adicionar à lista principal de admin
+                        adminList.appendChild(createSuggestionElement(suggestion, true));
+                        
+                        // Adicionar ao painel correspondente
+                        const targetDiv = suggestion.status === 'pending' ? pendingDiv :
+                                        suggestion.status === 'approved' ? approvedDiv :
+                                        rejectedDiv;
+                        
+                        targetDiv.appendChild(createSuggestionElement(suggestion, true));
+                    });
+                    
+                    // Mostrar mensagem quando não houver resultados
+                    if (filteredSuggestions.length === 0) {
+                        adminList.innerHTML = `
+                            <div class="bg-gray-50 rounded-lg p-4 text-center">
+                                <p class="text-gray-500">Nenhuma sugestão encontrada com os filtros selecionados.</p>
+                            </div>
+                        `;
+                    }
+                    
+                } else {
+                    adminPanel.classList.add('hidden');
+                }
+                
+            } catch (error) {
+                console.error('Erro ao carregar sugestões:', error);
+                // Mostrar mensagem de erro
+                const errorMessage = `
+                    <div class="bg-red-50 border-l-4 border-red-400 p-4">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                                </svg>
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm text-red-700">Erro ao carregar sugestões. Por favor, tente novamente.</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                adminList.innerHTML = errorMessage;
+            }
+        }
+
+        function createSuggestionElement(suggestion, isAdminView) {
+            const div = document.createElement('div');
+            div.className = 'bg-white p-4 rounded-lg shadow border border-gray-200 hover:shadow-md transition-all duration-200';
+            
+            const statusColors = {
+                'pending': 'bg-yellow-100 text-yellow-800',
+                'approved': 'bg-green-100 text-green-800',
+                'rejected': 'bg-red-100 text-red-800'
+            };
+            
+            const statusLabels = {
+                'pending': 'Pendente',
+                'approved': 'Aprovada',
+                'rejected': 'Rejeitada'
+            };
+            
+            div.innerHTML = `
+                <div class="flex justify-between items-start">
+                    <div class="flex-1">
+                        <p class="font-medium text-gray-900">${suggestion.category}</p>
+                        ${isAdminView ? `
+                            <p class="text-sm text-gray-500 mt-1">
+                                <span class="inline-flex items-center">
+                                    <svg class="h-4 w-4 text-gray-400 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                    </svg>
+                                    ${suggestion.user_email}
+                                </span>
+                            </p>
+                        ` : ''}
+                        <p class="text-sm text-gray-500 mt-1">
+                            <span class="inline-flex items-center">
+                                <svg class="h-4 w-4 text-gray-400 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                </svg>
+                                ${new Date(suggestion.created_at).toLocaleDateString()}
+                            </span>
+                        </p>
+                    </div>
+                    <span class="px-2 py-1 text-xs font-medium rounded-full ${statusColors[suggestion.status]}">
+                        ${statusLabels[suggestion.status]}
+                    </span>
+                </div>
+                ${suggestion.admin_response ? `
+                    <div class="mt-3 p-3 bg-gray-50 rounded-lg">
+                        <p class="text-sm text-gray-700">
+                            <span class="font-medium">Resposta:</span> 
+                            ${suggestion.admin_response}
+                        </p>
+                    </div>
+                ` : ''}
+                ${isAdminView && suggestion.status === 'pending' ? `
+                    <div class="mt-3 flex space-x-2">
+                        <button onclick="respondToSuggestion(${suggestion.id}, 'approved')" 
+                                class="flex-1 px-3 py-1.5 text-sm text-white bg-green-500 rounded-lg hover:bg-green-600 transition-colors duration-200">
+                            Aprovar
+                        </button>
+                        <button onclick="respondToSuggestion(${suggestion.id}, 'rejected')"
+                                class="flex-1 px-3 py-1.5 text-sm text-white bg-red-500 rounded-lg hover:bg-red-600 transition-colors duration-200">
+                            Rejeitar
+                        </button>
+                    </div>
+                ` : ''}
+            `;
+            
+            return div;
+        }
+
+        async function respondToSuggestion(id, status) {
+            const response = prompt('Digite sua resposta:');
+            if (!response) return;
+            
+            try {
+                await fetch(`/api/suggestions/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({
+                        status,
+                        admin_response: response
+                    })
+                });
+                
+                loadSuggestions();
+            } catch (error) {
+                console.error('Erro ao responder sugestão:', error);
+            }
+        }
+
+        // Formulário de sugestão
+        document.getElementById('suggestionForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const suggestion = document.getElementById('suggestion').value;
+            
+            try {
+                await fetch('/api/suggestions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({
+                        category: suggestion
+                    })
+                });
+                
+                document.getElementById('suggestion').value = '';
+                loadSuggestions();
+            } catch (error) {
+                console.error('Erro ao enviar sugestão:', error);
+            }
+        });
+
+        // Configuração do Alpine.js
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('tabsData', () => ({
+                activeTab: 'overview',
+                async init() {
+                    // Carregar dados iniciais baseado na URL
+                    const hash = window.location.hash.replace('#', '');
+                    if (hash) {
+                        this.activeTab = hash;
+                        await this.loadTabContent(hash);
+                    }
+
+                    // Observar mudanças de tab
+                    this.$watch('activeTab', async (value) => {
+                        console.log("Tab alterada para:", value);
+                        await this.loadTabContent(value);
+                    });
+                },
+                async loadTabContent(tab) {
+                    switch (tab) {
+                        case 'dashboard':
+                            await loadDashboard();
+                            break;
+                        case 'examples-by-category':
+                            await loadCategoryExamples();
+                            break;
+                        case 'test-search':
+                            // Inicializar componentes da busca se necessário
+                            break;
+                        case 'suggestions':
+                            await loadSuggestions();
+                            break;
+                        case 'database':
+                            await loadTableData();
+                            break;
+                    }
+                }
+            }));
+        });
+
+        // Funções de carregamento de dados
+        async function loadDashboard() {
+            try {
+                const response = await fetch('/api/statistics', {
+                    credentials: 'same-origin'
+                });
+                const data = await response.json();
+                
+                // Atualizar elementos do dashboard
+                document.getElementById('totalSearches').textContent = data.total_searches;
+                document.getElementById('avgCertainty').textContent = `${(data.average_certainty * 100).toFixed(1)}%`;
+                document.getElementById('uniqueCategories').textContent = data.top_categories.length;
+                
+                // Atualizar top categorias
+                const topCategoriesDiv = document.getElementById('topCategories');
+                if (!topCategoriesDiv) {
+                    console.error("Container topCategories não encontrado!");
+                    return;
+                }
+                
+                topCategoriesDiv.innerHTML = data.top_categories.map(cat => `
+                    <div class="flex items-center">
+                        <div class="flex-1">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="text-sm font-medium text-gray-700">${cat.category}</span>
+                                <span class="text-sm text-gray-500">${cat.count}</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-primary-600 h-2 rounded-full" style="width: ${(cat.count / data.total_searches * 100)}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+                
+                // Atualizar pesquisas recentes
+                const recentSearchesDiv = document.getElementById('recentSearches');
+                if (!recentSearchesDiv) {
+                    console.error("Container recentSearches não encontrado!");
+                    return;
+                }
+                
+                recentSearchesDiv.innerHTML = data.recent_searches.map(search => `
+                    <div class="border-l-4 border-primary-500 pl-4 py-2">
+                        <p class="text-sm font-medium text-gray-900">${search.query}</p>
+                        <p class="text-sm text-gray-500">
+                            ${search.category} 
+                            <span class="ml-2 px-2 py-0.5 text-xs rounded-full ${
+                                search.certainty >= 0.8 ? 'bg-green-100 text-green-800' :
+                                search.certainty >= 0.6 ? 'bg-yellow-100 text-yellow-800' :
+                                'bg-red-100 text-red-800'
+                            }">
+                                ${(search.certainty * 100).toFixed(1)}%
+                            </span>
+                        </p>
+                        <p class="text-xs text-gray-400 mt-1">
+                            ${new Date(search.created_at).toLocaleString()}
+                        </p>
+                    </div>
+                `).join('');
+                
+            } catch (error) {
+                console.error('Erro ao carregar dashboard:', error);
+            }
+        }
+
+        async function loadCategoryExamples() {
+            const loadingDiv = document.getElementById('examplesLoading');
+            const container = document.getElementById('categoryExamples');
+            
+            try {
+                // Mostrar loading
+                loadingDiv.classList.remove('hidden');
+                container.innerHTML = '';
+                
+                const response = await fetch('/api/examples', {
+                    credentials: 'same-origin',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                // Ordenar categorias alfabeticamente
+                const categories = Object.keys(data).sort();
+                
+                if (categories.length === 0) {
+                    container.innerHTML = `
+                        <div class="col-span-full">
+                            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-lg">
+                                <div class="flex">
+                                    <div class="flex-shrink-0">
+                                        <svg class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                        </svg>
+                                    </div>
+                                    <div class="ml-3">
+                                        <p class="text-sm text-yellow-700">
+                                            Nenhum exemplo encontrado.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                categories.forEach(category => {
+                    const examples = data[category];
+                    const categoryDiv = document.createElement('div');
+                    categoryDiv.className = 'bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-all duration-200';
+                    
+                    categoryDiv.innerHTML = `
+                        <div class="flex items-center space-x-2 mb-4">
+                            <div class="w-2 h-2 bg-primary-500 rounded-full"></div>
+                            <h3 class="text-lg font-medium text-gray-900">
+                                ${category.charAt(0).toUpperCase() + category.slice(1)}
+                            </h3>
+                        </div>
+                        <ul class="space-y-3">
+                            ${examples.map(example => `
+                                <li class="flex items-start group">
+                                    <svg class="h-5 w-5 text-primary-500 mr-2 mt-0.5 transform group-hover:scale-110 transition-transform" 
+                                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                    </svg>
+                                    <span class="text-sm text-gray-600 group-hover:text-gray-900 transition-colors">
+                                        ${example}
+                                    </span>
+                                </li>
+                            `).join('')}
+                        </ul>
+                    `;
+                    
+                    container.appendChild(categoryDiv);
+                });
+            } catch (error) {
+                console.error('Erro ao carregar exemplos:', error);
+                container.innerHTML = `
+                    <div class="col-span-full">
+                        <div class="bg-red-50 border-l-4 border-red-400 p-4 rounded-lg">
+                            <div class="flex">
+                                <div class="flex-shrink-0">
+                                    <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                                    </svg>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-sm text-red-700">
+                                        Erro ao carregar exemplos. Por favor, tente novamente mais tarde.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } finally {
+                // Esconder loading
+                loadingDiv.classList.add('hidden');
+            }
+        }
+
+        // Atualize a função performSearch
+        async function performSearch(query) {
+            const loadingDiv = document.getElementById('searchLoading');
+            const searchButton = document.querySelector('#searchTestForm button[type="submit"]');
+            const resultDiv = document.getElementById('searchResult');
+            const categorySpan = document.getElementById('resultCategory');
+            const certaintySpan = document.getElementById('resultCertainty');
+            
+            try {
+                // Mostrar loading e desabilitar botão
+                loadingDiv.classList.remove('hidden');
+                searchButton.disabled = true;
+                searchButton.classList.add('opacity-50', 'cursor-not-allowed');
+                resultDiv.classList.add('hidden');
+                
+                const response = await fetch('/search_text', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({ query })
+                });
+                
+                const data = await response.json();
+                
+                // Aguardar um mínimo de tempo para mostrar o loading (melhor UX)
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                // Mostrar resultado
+                resultDiv.classList.remove('hidden');
+                
+                if (response.ok) {
+                    categorySpan.textContent = data.document;
+                    const certainty = (data.degree_of_certainty * 100).toFixed(1);
+                    certaintySpan.textContent = `${certainty}%`;
+                    
+                    // Definir cor baseada no grau de certeza
+                    if (data.degree_of_certainty >= 0.8) {
+                        certaintySpan.className = 'px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800';
+                    } else if (data.degree_of_certainty >= 0.6) {
+                        certaintySpan.className = 'px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800';
+                    } else {
+                        certaintySpan.className = 'px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800';
+                    }
+                    
+                    // Adicionar ao histórico
+                    addToHistory(query, data);
+                    
+                    // Atualizar dashboard se necessário
+                    if (document.querySelector('[x-show="activeTab === \'dashboard\'"]')) {
+                        await loadDashboard();
+                    }
+                } else {
+                    categorySpan.textContent = data.message || 'Erro na busca';
+                    certaintySpan.textContent = 'N/A';
+                    certaintySpan.className = 'px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800';
+                }
+            } catch (error) {
+                console.error('Erro na busca:', error);
+                resultDiv.classList.remove('hidden');
+                categorySpan.textContent = 'Erro ao processar a busca';
+                certaintySpan.textContent = 'Erro';
+                certaintySpan.className = 'px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800';
+            } finally {
+                // Restaurar estado inicial
+                loadingDiv.classList.add('hidden');
+                searchButton.disabled = false;
+                searchButton.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+        }
+
+        // Adicione a função addToHistory
+        function addToHistory(query, result) {
+            const historyDiv = document.getElementById('searchHistory');
+            const historyItem = document.createElement('div');
+            historyItem.className = 'bg-white p-4 rounded-lg shadow-sm border border-gray-200';
+            
+            const certainty = result.degree_of_certainty ? 
+                (result.degree_of_certainty * 100).toFixed(1) + '%' : 'N/A';
+            const certaintyClass = result.degree_of_certainty >= 0.8 ? 
+                'bg-green-100 text-green-800' :
+                result.degree_of_certainty >= 0.6 ? 
+                    'bg-yellow-100 text-yellow-800' : 
+                    'bg-red-100 text-red-800';
+            
+            historyItem.innerHTML = `
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-sm font-medium text-gray-900">${query}</p>
+                        <p class="text-sm text-gray-500">${result.document}</p>
+                    </div>
+                    <span class="px-2 py-1 text-xs font-medium rounded-full ${certaintyClass}">
+                        ${certainty}
+                    </span>
+                </div>
+            `;
+            
+            historyDiv.insertBefore(historyItem, historyDiv.firstChild);
+        }
+
+        // Adicionar listener ao formulário
+        document.getElementById('searchTestForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const query = document.getElementById('searchQuery').value;
+            if (query) {
+                await performSearch(query);
+                document.getElementById('searchQuery').value = '';
+            }
+        });
+
+        // Adicione uma função para atualização automática do dashboard
+        function startDashboardAutoUpdate() {
+            // Atualizar a cada 30 segundos
+            setInterval(async () => {
+                if (document.querySelector('[x-show="activeTab === \'dashboard\'"]')) {
+                    console.log("Atualizando dashboard automaticamente...");
+                    await loadDashboard();
+                }
+            }, 30000);
+        }
+
+        // Inicie a atualização automática quando a página carregar
+        document.addEventListener('DOMContentLoaded', () => {
+            startDashboardAutoUpdate();
+        });
+
+        // Adicione os event listeners para os filtros
+        document.addEventListener('DOMContentLoaded', () => {
+            const userFilter = document.getElementById('userFilter');
+            const statusFilter = document.getElementById('statusFilter');
+            
+            if (userFilter) {
+                userFilter.addEventListener('change', () => {
+                    console.log('Filtro de usuário alterado:', userFilter.value);
+                    loadSuggestions();
+                });
+            }
+            
+            if (statusFilter) {
+                statusFilter.addEventListener('change', () => {
+                    console.log('Filtro de status alterado:', statusFilter.value);
+                    loadSuggestions();
+                });
+            }
+        });
+
+        // Adicione a função loadTableData
+        async function loadTableData() {
+            const tableSelect = document.getElementById('tableSelect');
+            const loading = document.getElementById('tableLoading');
+            const tableHeader = document.getElementById('tableHeader');
+            const tableBody = document.getElementById('tableBody');
+            
+            if (!tableSelect || !loading || !tableHeader || !tableBody) {
+                console.error('Elementos da tabela não encontrados');
+                return;
+            }
+            
+            try {
+                loading.classList.remove('hidden');
+                tableHeader.innerHTML = '';
+                tableBody.innerHTML = '';
+                
+                const response = await fetch(`/api/database/${tableSelect.value}`, {
+                    credentials: 'same-origin',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log('Dados recebidos:', data); // Debug
+                
+                if (!data.columns || !data.rows) {
+                    throw new Error('Formato de dados inválido');
+                }
+                
+                // Criar cabeçalho
+                tableHeader.innerHTML = `
+                    <tr>
+                        ${data.columns.map(column => `
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                ${column}
+                            </th>
+                        `).join('')}
+                    </tr>
+                `;
+                
+                // Criar linhas de dados
+                if (data.rows.length === 0) {
+                    tableBody.innerHTML = `
+                        <tr>
+                            <td colspan="${data.columns.length}" class="px-6 py-4 text-center text-sm text-gray-500">
+                                Nenhum dado encontrado
+                            </td>
+                        </tr>
+                    `;
+                } else {
+                    tableBody.innerHTML = data.rows.map(row => `
+                        <tr class="hover:bg-gray-50">
+                            ${Object.values(row).map(value => `
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    ${value === null ? '<span class="text-gray-400">null</span>' : 
+                                      typeof value === 'boolean' ? (value ? 'Sim' : 'Não') :
+                                      typeof value === 'string' && value.length > 100 ? value.substring(0, 100) + '...' :
+                                      value}
+                                </td>
+                            `).join('')}
+                        </tr>
+                    `).join('');
+                }
+                
+            } catch (error) {
+                console.error('Erro ao carregar dados:', error);
+                const errorMessage = `
+                    <tr>
+                        <td colspan="${data?.columns?.length || 1}" class="px-6 py-4 text-center">
+                            <div class="bg-red-50 border-l-4 border-red-400 p-4">
+                                <div class="flex">
+                                    <div class="flex-shrink-0">
+                                        <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                                        </svg>
+                                    </div>
+                                    <div class="ml-3">
+                                        <p class="text-sm text-red-700">
+                                            Erro ao carregar dados. Por favor, tente novamente.
+                                            ${error.message ? `<br><span class="text-xs">${error.message}</span>` : ''}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                tableBody.innerHTML = errorMessage;
+            } finally {
+                loading.classList.add('hidden');
+            }
+        }
+    </script>
 </body>
 </html>
