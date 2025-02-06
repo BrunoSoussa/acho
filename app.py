@@ -193,6 +193,7 @@ def verify_database_structure():
     
     conn.close()
 
+
 # Adicione esta linha após create_tables() e migrate_database()
 verify_database_structure()
 
