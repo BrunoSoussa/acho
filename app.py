@@ -479,7 +479,7 @@ def api_search_text():
         return jsonify({"error": str(e)}), 500
 
 @app.route("/get_all_texts", methods=["GET"])
-@token_required
+
 def api_get_all_texts():
     category_mapping = [
         {"document": list(value.keys())[0], "id": list(value.values())[0]}
