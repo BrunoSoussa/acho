@@ -704,9 +704,10 @@ def get_statistics():
     }), 200
 
 @app.route('/api/examples', methods=['GET'])
+@api_token_required
 def get_random_examples():
     # Caminho completo do arquivo
-    file_path = r"C:\Users\bruno\OneDrive\Documentos\tut_projects\recomendator\analises\dataset_transformado_not_lema.csv"
+    file_path = r"../analises/dataset_transformado_not_lema.csv"
     examples_by_category = {}
     
     try:
