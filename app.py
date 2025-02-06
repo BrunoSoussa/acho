@@ -707,7 +707,7 @@ def get_statistics():
 @api_token_required
 def get_random_examples():
     # Caminho completo do arquivo
-    file_path = r"../analises/dataset_transformado_not_lema.csv"
+    file_path = r":/var/www/html/acho-ia/acho/analises/dataset_transformado_not_lema.csv"
     examples_by_category = {}
     
     try:
