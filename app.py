@@ -561,42 +561,49 @@ def get_suggestions():
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     
-    if is_admin:
-        # Admins veem todas as sugestões pendentes e suas próprias
-        cursor.execute("""
-            SELECT s.*, u.email 
-            FROM suggestions s
-            JOIN users u ON s.user_id = u.id
-            WHERE s.status = 'pending' OR s.user_id = ?
-            ORDER BY 
-                CASE 
-                    WHEN s.status = 'pending' THEN 1 
-                    ELSE 2 
-                END,
-                s.created_at DESC
-        """, (user_id,))
-    else:
-        # Usuários normais veem apenas suas próprias sugestões
-        cursor.execute("""
-            SELECT s.*, NULL as email
-            FROM suggestions s
-            WHERE s.user_id = ?
-            ORDER BY s.created_at DESC
-        """, (user_id,))
-    
-    suggestions = cursor.fetchall()
-    conn.close()
-    
-    return jsonify([{
-        'id': s[0],
-        'user_id': s[1],
-        'category': s[2],
-        'status': s[3],
-        'admin_response': s[4],
-        'created_at': s[5],
-        'updated_at': s[6],
-        'user_email': s[7]
-    } for s in suggestions]), 200
+    try:
+        if is_admin:
+            # Admins veem todas as sugestões
+            cursor.execute("""
+                SELECT s.*, u.email 
+                FROM suggestions s
+                JOIN users u ON s.user_id = u.id
+                ORDER BY 
+                    CASE 
+                        WHEN s.status = 'pending' THEN 1
+                        WHEN s.status = 'approved' THEN 2
+                        ELSE 3
+                    END,
+                    s.created_at DESC
+            """)
+        else:
+            # Usuários normais veem todas as suas próprias sugestões
+            cursor.execute("""
+                SELECT s.*, u.email
+                FROM suggestions s
+                JOIN users u ON s.user_id = u.id
+                WHERE s.user_id = ?
+                ORDER BY s.created_at DESC
+            """, (user_id,))
+        
+        suggestions = cursor.fetchall()
+        
+        return jsonify([{
+            'id': s[0],
+            'user_id': s[1],
+            'category': s[2],
+            'status': s[3],
+            'admin_response': s[4],
+            'created_at': s[5],
+            'updated_at': s[6],
+            'user_email': s[7]
+        } for s in suggestions]), 200
+        
+    except Exception as e:
+        print(f"Erro ao buscar sugestões: {e}")
+        return jsonify({'message': 'Erro ao buscar sugestões!'}), 500
+    finally:
+        conn.close()
 
 @app.route('/api/suggestions/<int:suggestion_id>', methods=['PUT'])
 @api_token_required
