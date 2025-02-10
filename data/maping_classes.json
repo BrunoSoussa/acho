@@ -1,80 +1,120 @@
 {
-  "oculos e itens para oculos": {"Óticas": "0"},
-  "papelaria e escritorio": {"Papelaria": "1"},
-  "ferramentas e equipamentos": {"Ferramentas": "2"},
-  "brinquedos e jogos educativos": {"Brinquedos": "3"},
-  "moveis": {"Móveis": "4"},
-  "moda e acessorios": {"Moda e Acessórios": "6"},
-  "materiais de construcao": {"Material de Construção": "7"},
-  "itens de colecao": {"Colecionáveis": "8"},
-  "instrumentos musicais": {"Música": "9"},
-  "decoracao para festas": {"Festas": "11"},
-  "eletronicos e gadgets": {"Eletrônicos": "12"},
-  "carros": {"Carros": "13"},
-  "beleza e autocuidado": {"Beleza": "14"},
-  "itens para adultos como brinquedos sexuais": {"Sexshop": "17"},
-  "fotografia": {"Fotografia": "18"},
-  "eletrodomesticos": {"Eletrodomésticos": "20"},
-  "joias e bijuterias": {"Joias": "21"},
-  "livros e materiais literarios": {"Livros": "22"},
-  "suplementos": {"Suplementos": "23"},
-  "medicamentos": {"Medicamentos": "24"},
-  "peixaria e pescados": {"Peixaria": "25"},
-  "bebidas alcoolicas": {"Bebidas": "26"},
-  "paes": {"Pães": "27"},
-  "doces e chocolates": {"Chocolates": "29"},
-  "pizzaria": {"Pizzaria": "41"},
-  "flores e plantas": {"Flores e Plantas": "42"},
-  "servicos de desenvolvimento de software": {"Desenv. Software": "43"},
-  "celulares e smartphones": {"Celulares e Smartphones": "45"},
-  "servico de reparo de eletronicos": {"Serviço de reparo de Eletrônicos": "46"},
-  "tintas": {"Tintas": "47"},
-  "hortifruti": {"Hortifruti": "48"},
-  "acougue": {"Açougue": "49"},
-  "baterias automotivas": {"Baterias Automotivas": "50"},
-  "auto escola": {"Auto Escola": "51"},
-  "grafica": {"Gráfica": "52"},
-  "gas": {"Gás": "53"},
-  "agua": {"Agua": "54"},
-  "refrigeracao automotiva": {"Refrigeração Automotiva": "55"}, 
-  "salgados": {"Salgados": "56"},
-  "servico de dj": {"DJ": "57"},
-  "sushi": {"Sushi": "58"},
-  "locacao veicular": {"Locação Veicular": "59"},
-  "agencia de marketing": {"Agência de Marketing": "60"},
-  "troca de oleo": {"Troca de Oleo Automotiva": "61"},
-  "design de produtos": {"Design de Produtos": "62"},
-  "consorcio": {"Consorcio": "63"},
-  "construcao civil":{"Construção Civil": "64"},
-  "aluguel de imoveis":{"Aluguel de Imóveis":"65"},
-  "venda de imoveis":{"Vendas de Imóveis":"66"},
-  "hospedagem":{"hospedagem":"67"},
-  "servicos de seguros":{"Serviço de Seguros":"68"},
-  "geleia":{"Geleia":"69"},
-  "assistencia tecnica em celulares":{"Assistência Têcnica em Celulares":"70"},
-  "assistencia tecnica em computadores":{"Assistência Têcnica em Computadores":"71"},
-  "equipamentos para panificacao":{"Equipamentos para panificação":"72"},
-  "ingredientes para panificacao":{"Ingredientes para Panificação":"73"},
-  "trabalhos cientificos":{"Trabalhos Ciêntificos":"74"},
-  "vidros":{"Vidros":"75"},
-  "barbearia":{"Barbearia":"76"},
-  "autopecas para carros":{"Autopeças para Carros":"77"},
-  "autopecas para motos":{"Autopeças para motos":"78"},
-  "crossfit":{"Crossfit":"79"},
-  "sorveteria":{"Sorveteria":"80"},
-  "reforco escolar":{"Reforço Escolar":"81"},
-  "motos":{"Motos":"82"},
-  "produtos para equinos":{"Produtos para Equinos":"83"},
-  "hamburgueres":{"Hamburgueres":"84"},
-  "servicos veterinarios":{"Servicos Veterinarios":"85"},
-  "acessorios para pets":{"Acessorios para Pets":"86"},
-  "racao para pets":{"Racao para Pets":"87"},
-  "cama mesa e banho":{"Cama, Mesa e Banho":"88"},
-  "espetinhos":{"Espetinhos":"89"},
-  "emprestimos":{"Emprestimos":"90"},
-  "banho e tosa":{"Banho e Tosa":"91"}
- 
- 
+  "Alimentos e Bebidas": {
+    "peixaria e pescados": { "Peixaria": "25" },
+    "bebidas alcoolicas": { "Bebidas": "26" },
+    "paes": { "Pães": "27" },
+    "doces e chocolates": { "Chocolates": "29" },
+    "pizzaria": { "Pizzaria": "41" },
+    "hortifruti": { "Hortifruti": "48" },
+    "acougue": { "Açougue": "49" },
+    "salgados": { "Salgados": "56" },
+    "sushi": { "Sushi": "58" },
+    "hamburgueres": { "Hamburgueres": "84" },
+    "geleia": { "Geleia": "69" },
+    "espetinhos": { "Espetinhos": "89" },
+    "sorveteria": { "Sorveteria": "80" }
+  },
+  "Moda, Beleza e Acessórios": {
+    "moda e acessorios": { "Moda e Acessórios": "6" },
+    "beleza e autocuidado": { "Beleza": "14" },
+    "joias e bijuterias": { "Joias": "21" },
+    "barbearia": { "Barbearia": "76" }
+  },
+  "Óticas": {
+    "oculos e itens para oculos": { "Óticas": "0" }
+  },
+  "Casa, Decoração e Jardim": {
+    "moveis": { "Móveis": "4" },
+    "decoracao para festas": { "Festas": "11" },
+    "cama mesa e banho": { "Cama, Mesa e Banho": "88" },
+    "flores e plantas": { "Flores e Plantas": "42" },
+    "luminarias": {"Luminarias":"92"},
+    "solucoes em irrigacao": { "Solucoes em Irrigacao": "93" }
+  },
+  "Construção, Ferramentas e Materiais": {
+    "ferramentas e equipamentos": { "Ferramentas": "2" },
+    "materiais de construcao": { "Material de Construção": "7" },
+    "construcao civil": { "Construção Civil": "64" },
+    "tintas": { "Tintas": "47" },
+    "vidros": { "Vidros": "75" }
+  },
+  "Eletrônicos e Tecnologia": {
+    "eletronicos e gadgets": { "Eletrônicos": "12" },
+    "celulares e smartphones": { "Celulares e Smartphones": "45" },
+    "servico de reparo de eletronicos": { "Serviço de reparo de Eletrônicos": "46" },
+    "assistencia tecnica em celulares": { "Assistência Têcnica em Celulares": "70" },
+    "assistencia tecnica em computadores": { "Assistência Têcnica em Computadores": "71" },
+    "servicos de desenvolvimento de software": { "Desenv. Software": "43" }
+  },
+  "Automotivo": {
+    "carros": { "Carros": "13" },
+    "baterias automotivas": { "Baterias Automotivas": "50" },
+    "refrigeracao automotiva": { "Refrigeração Automotiva": "55" },
+    "troca de oleo": { "Troca de Oleo Automotiva": "61" },
+    "autopecas para carros": { "Autopeças para Carros": "77" },
+    "autopecas para motos": { "Autopeças para motos": "78" },
+    "motos": { "Motos": "82" },
+    "locacao veicular": { "Locação Veicular": "59" },
+    "auto escola": { "Auto Escola": "51" },
+    "lavagem de veiculos": { "Lavagem de Veiculos": "96" },
+    "estetica automotiva": { "Estetica Automotiva": "97" }
+  },
+  "Serviços Financeiros": {
+    "consorcio": { "Consorcio": "63" },
+    "emprestimos": { "Emprestimos": "90" }
+  },
+  "Imóveis e Hospedagem": {
+    "aluguel de imoveis": { "Aluguel de Imóveis": "65" },
+    "venda de imoveis": { "Vendas de Imóveis": "66" },
+    "hospedagem": { "hospedagem": "67" }
+  },
+  "Serviços Profissionais": {
+    "servicos de seguros": { "Serviço de Seguros": "68" },
+    "agencia de marketing": { "Agência de Marketing": "60" },
+    "design de produtos": { "Design de Produtos": "62" },
+    "grafica": { "Gráfica": "52" },
+    "trabalhos cientificos": { "Trabalhos Ciêntificos": "74" }
+  },
+  "Educação e Esportes": {
+    "crossfit": { "Crossfit": "79" },
+    "reforco escolar": { "Reforço Escolar": "81" }
+  },
+  "Papelaria e Livraria": {
+    "papelaria e escritorio": { "Papelaria": "1" },
+    "livros e materiais literarios": { "Livros": "22" }
+  },
+  "Saúde e Bem-Estar": {
+    "suplementos": { "Suplementos": "23" },
+    "medicamentos": { "Medicamentos": "24" },
+    "servicos odontologicos": { "Serviços Odontologicos": "94" },
+    "servicos cardiologicos": { "Serviços Cardiologicos": "95" }
+  },
+  "Panificação": {
+    "equipamentos para panificacao": { "Equipamentos para panificação": "72" },
+    "ingredientes para panificacao": { "Ingredientes para Panificação": "73" }
+  },
+  "Entretenimento e Lazer": {
+    "brinquedos e jogos educativos": { "Brinquedos": "3" },
+    "itens de colecao": { "Colecionáveis": "8" },
+    "instrumentos musicais": { "Música": "9" },
+    "fotografia": { "Fotografia": "18" },
+    "servico de dj": { "DJ": "57" }
+  },
+  "Pets e Animais": {
+    "acessorios para pets": { "Acessorios para Pets": "86" },
+    "racao para pets": { "Racao para Pets": "87" },
+    "servicos veterinarios": { "Servicos Veterinarios": "85" },
+    "produtos para equinos": { "Produtos para Equinos": "83" },
+    "banho e tosa": { "Banho e Tosa": "91" }
+  },
+  "Utilidades": {
+    "gas": { "Gás": "53" },
+    "agua": { "Agua": "54" }
+  },
+  "Adultos": {
+    "itens para adultos como brinquedos sexuais": { "Sexshop": "17" }
+  },
+  "Eletrodomésticos": {
+    "eletrodomesticos": { "Eletrodomésticos": "20" }
+  }
 }
-
-

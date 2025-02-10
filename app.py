@@ -367,7 +367,7 @@ def api_token_required(f):
     return decorated
 
 @app.route("/search_text", methods=["POST"])
-#@api_token_required
+# @api_token_required
 def api_search_text():
     try:
         data = request.get_json()
@@ -394,24 +394,29 @@ def api_search_text():
         print(rounded_values)
         top_labels = [id2label[idx.item()] for idx in indices[0]]
         print(top_labels)
-        top_results = [
-            {
-                "document": (
-                    list(mapping_classes.get(top_labels[i], {}).keys())[0]
-                    if mapping_classes.get(top_labels[i], {})
-                    else ""
-                ),
-                "id": (
-                    list(mapping_classes.get(top_labels[i], {}).values())[0]
-                    if mapping_classes.get(top_labels[i], {})
-                    else ""
-                ),
-                "degree_of_certainty": rounded_values[i],
-            }
-            for i in range(len(top_labels))
-        ]
 
-        # Salvar no banco se o grau de certeza for suficientemente alto
+        # Atualiza a extração dos dados a partir da nova estrutura de mapping_classes
+        top_results = []
+        for i, label in enumerate(top_labels):
+            subcat_mapping = None
+            # Procura pela subcategoria em cada grupo
+            for group in mapping_classes.values():
+                if label in group:
+                    subcat_mapping = group[label]
+                    break
+            if subcat_mapping:
+                document = list(subcat_mapping.keys())[0]
+                cat_id = list(subcat_mapping.values())[0]
+            else:
+                document = ""
+                cat_id = ""
+            top_results.append({
+                "document": document,
+                "id": cat_id,
+                "degree_of_certainty": rounded_values[i],
+            })
+
+        # Se o grau de certeza do primeiro resultado for suficientemente alto, salva e retorna
         if top_results[0]["degree_of_certainty"] >= 0.9:
             save_to_db(query, top_results[0], top_results[0]["degree_of_certainty"])
             return jsonify(top_results[0]), 200
@@ -437,14 +442,9 @@ def api_search_text():
             response_text = response.text.strip().replace("```json", "").replace("```", "")
 
             if response_text == "None":
-                return (
-                    jsonify(
-                        {
-                            "message": "Não encontrei uma categoria para o produto. Pode descrever melhor?"
-                        }
-                    ),
-                    404,
-                )
+                return jsonify(
+                    {"message": "Não encontrei uma categoria para o produto. Pode descrever melhor?"}
+                ), 404
 
             try:
                 category_data = json.loads(response_text)
@@ -458,39 +458,38 @@ def api_search_text():
                     save_to_db(query, matching_document, matching_document.get("degree_of_certainty", None))
                     return jsonify(matching_document), 200
                 else:
-                    return (
-                        jsonify(
-                            {
-                                "message": "ID retornado pelo modelo não encontrado nos resultados."
-                            }
-                        ),
-                        404,
-                    )
+                    return jsonify(
+                        {"message": "ID retornado pelo modelo não encontrado nos resultados."}
+                    ), 404
 
             except json.JSONDecodeError:
-                return (
-                    jsonify({"error": "Erro ao interpretar a resposta do modelo."}),
-                    500,
-                )
+                return jsonify({"error": "Erro ao interpretar a resposta do modelo."}), 500
         except Exception as e:
+            # Em caso de erro na chamada do modelo Gemini, salva e retorna o primeiro resultado
             save_to_db(query, top_results[0], top_results[0].get("degree_of_certainty", None))
             return jsonify(top_results[0]), 202
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+
 @app.route("/get_all_texts", methods=["GET"])
-
 def api_get_all_texts():
-    category_mapping = [
-        {"document": list(value.keys())[0], "id": list(value.values())[0]}
-        for value in mapping_classes.values()
-    ]
     try:
-
-        return jsonify(category_mapping), 200
+        output = {}
+        # Itera por cada categoria e suas subcategorias
+        for categoria, subcategorias in mapping_classes.items():
+            subs = []
+            for subcat in subcategorias.values():
+                document = list(subcat.keys())[0]
+                cat_id = list(subcat.values())[0]
+                subs.append({"document": document, "id": cat_id})
+            output[categoria] = subs
+        return jsonify(output), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
 
 @app.route("/get_queries", methods=["GET"])
 #@token_required
