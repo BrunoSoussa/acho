@@ -562,19 +562,19 @@ def get_suggestions():
     cursor = conn.cursor()
     
     if is_admin:
-        # Admins veem todas as sugestões pendentes e suas próprias
+        # Admins veem todas as sugestões
         cursor.execute("""
             SELECT s.*, u.email 
             FROM suggestions s
             JOIN users u ON s.user_id = u.id
-            WHERE s.status = 'pending' OR s.user_id = ?
             ORDER BY 
                 CASE 
-                    WHEN s.status = 'pending' THEN 1 
-                    ELSE 2 
+                    WHEN s.status = 'pending' THEN 1
+                    WHEN s.status = 'approved' THEN 2
+                    ELSE 3 
                 END,
                 s.created_at DESC
-        """, (user_id,))
+        """)
     else:
         # Usuários normais veem apenas suas próprias sugestões
         cursor.execute("""
