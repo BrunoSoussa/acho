@@ -59,32 +59,32 @@
             <!-- Navegação das tabs -->
             <div class="border-b border-gray-200">
                 <nav class="-mb-px flex space-x-8">
-                    <button @click="activeTab = 'overview'"
+                    <button @click="changeTab('overview')"
                             :class="{ 'border-primary-500 text-primary-600': activeTab === 'overview' }"
                             class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
                         Visão Geral
                     </button>
-                    <button @click="activeTab = 'dashboard'"
+                    <button @click="changeTab('dashboard')"
                             :class="{ 'border-primary-500 text-primary-600': activeTab === 'dashboard' }"
                             class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
                         Dashboard
                     </button>
-                    <button @click="activeTab = 'test-search'"
+                    <button @click="changeTab('test-search')"
                             :class="{ 'border-primary-500 text-primary-600': activeTab === 'test-search' }"
                             class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
                         Testar Busca
                     </button>
-                    <button @click="activeTab = 'examples-by-category'"
+                    <button @click="changeTab('examples-by-category')"
                             :class="{ 'border-primary-500 text-primary-600': activeTab === 'examples-by-category' }"
                             class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
                         Exemplos por Categoria
                     </button>
-                    <button @click="activeTab = 'suggestions'"
+                    <button @click="changeTab('suggestions')"
                             :class="{ 'border-primary-500 text-primary-600': activeTab === 'suggestions' }"
                             class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
                         Sugestões
                     </button>
-                    <button @click="activeTab = 'database'"
+                    <button @click="changeTab('database')"
                             :class="{ 'border-primary-500 text-primary-600': activeTab === 'database' }"
                             class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
                         <span class="flex items-center">
@@ -347,19 +347,16 @@ Content-Type: application/json
                 <div x-show="activeTab === 'examples-by-category'" class="space-y-6">
                     <h2 class="text-2xl font-bold text-gray-900">Exemplos por Categoria</h2>
                     
-                    <!-- Loading State -->
+                    <!-- Loading state -->
                     <div id="examplesLoading" class="hidden">
-                        <div class="flex items-center justify-center p-4 bg-white/80 backdrop-blur-sm rounded-lg border border-gray-200">
-                            <div class="flex items-center space-x-3">
-                                <div class="animate-spin rounded-full h-8 w-8 border-4 border-primary-500 border-t-transparent"></div>
-                                <span class="text-sm text-gray-500">Carregando exemplos...</span>
-                            </div>
+                        <div class="flex justify-center items-center">
+                            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
                         </div>
                     </div>
-
+                    
                     <!-- Container para os exemplos -->
-                    <div id="categoryExamples" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <!-- Os exemplos serão inseridos aqui dinamicamente -->
+                    <div id="examplesByCategory" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Os exemplos serão inseridos aqui -->
                     </div>
                 </div>
                 <div x-show="activeTab === 'suggestions'" class="space-y-8">
@@ -785,38 +782,48 @@ Content-Type: application/json
         // Configuração do Alpine.js
         document.addEventListener('alpine:init', () => {
             Alpine.data('tabsData', () => ({
-                activeTab: 'overview',
+                activeTab: localStorage.getItem('activeTab') || 'overview',
+                initialized: {},
+                
                 async init() {
-                    // Carregar dados iniciais baseado na URL
-                    const hash = window.location.hash.replace('#', '');
-                    if (hash) {
-                        this.activeTab = hash;
-                        await this.loadTabContent(hash);
+                    // Carregar dados da tab inicial se necessário
+                    if (!this.initialized[this.activeTab]) {
+                        await this.loadTabContent(this.activeTab);
                     }
-
-                    // Observar mudanças de tab
-                    this.$watch('activeTab', async (value) => {
-                        console.log("Tab alterada para:", value);
-                        await this.loadTabContent(value);
-                    });
                 },
-                async loadTabContent(tab) {
-                    switch (tab) {
-                        case 'dashboard':
-                            await loadDashboard();
-                            break;
-                        case 'examples-by-category':
-                            await loadCategoryExamples();
-                            break;
-                        case 'test-search':
-                            // Inicializar componentes da busca se necessário
-                            break;
-                        case 'suggestions':
-                            await loadSuggestions();
-                            break;
-                        case 'database':
-                            await loadTableData();
-                            break;
+                
+                async changeTab(tabName) {
+                    if (this.activeTab === tabName) return;
+                    
+                    this.activeTab = tabName;
+                    localStorage.setItem('activeTab', tabName); // Persistir a tab selecionada
+                    
+                    if (!this.initialized[tabName]) {
+                        await this.loadTabContent(tabName);
+                    }
+                },
+                
+                async loadTabContent(tabName) {
+                    this.initialized[tabName] = true;
+                    
+                    try {
+                        switch(tabName) {
+                            case 'dashboard':
+                                await loadDashboard();
+                                break;
+                            case 'examples-by-category':
+                                await loadCategoryExamples();
+                                break;
+                            case 'database':
+                                await loadTableData();
+                                break;
+                            case 'suggestions':
+                                await loadSuggestions();
+                                break;
+                        }
+                    } catch (error) {
+                        console.error(`Erro ao carregar conteúdo da tab ${tabName}:`, error);
+                        this.initialized[tabName] = false; // Permitir nova tentativa em caso de erro
                     }
                 }
             }));
@@ -888,54 +895,26 @@ Content-Type: application/json
         }
 
         async function loadCategoryExamples() {
+            const container = document.getElementById('examplesByCategory');
             const loadingDiv = document.getElementById('examplesLoading');
-            const container = document.getElementById('categoryExamples');
+            
+            if (!container || !loadingDiv) return;
             
             try {
-                // Mostrar loading
                 loadingDiv.classList.remove('hidden');
                 container.innerHTML = '';
                 
                 const response = await fetch('/api/examples', {
-                    credentials: 'same-origin',
-                    headers: {
-                        'Accept': 'application/json'
-                    }
+                    credentials: 'same-origin'
                 });
                 
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    throw new Error('Erro ao carregar exemplos');
                 }
                 
                 const data = await response.json();
                 
-                // Ordenar categorias alfabeticamente
-                const categories = Object.keys(data).sort();
-                
-                if (categories.length === 0) {
-                    container.innerHTML = `
-                        <div class="col-span-full">
-                            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-lg">
-                                <div class="flex">
-                                    <div class="flex-shrink-0">
-                                        <svg class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
-                                            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
-                                        </svg>
-                                    </div>
-                                    <div class="ml-3">
-                                        <p class="text-sm text-yellow-700">
-                                            Nenhum exemplo encontrado.
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                    return;
-                }
-                
-                categories.forEach(category => {
-                    const examples = data[category];
+                Object.entries(data).forEach(([category, examples]) => {
                     const categoryDiv = document.createElement('div');
                     categoryDiv.className = 'bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-all duration-200';
                     
@@ -963,6 +942,7 @@ Content-Type: application/json
                     
                     container.appendChild(categoryDiv);
                 });
+                
             } catch (error) {
                 console.error('Erro ao carregar exemplos:', error);
                 container.innerHTML = `
@@ -984,7 +964,6 @@ Content-Type: application/json
                     </div>
                 `;
             } finally {
-                // Esconder loading
                 loadingDiv.classList.add('hidden');
             }
         }
