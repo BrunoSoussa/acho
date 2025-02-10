@@ -562,19 +562,19 @@ def get_suggestions():
     cursor = conn.cursor()
     
     if is_admin:
-        # Admins veem todas as sugestões
+        # Admins veem todas as sugestões pendentes e suas próprias
         cursor.execute("""
             SELECT s.*, u.email 
             FROM suggestions s
             JOIN users u ON s.user_id = u.id
+            WHERE s.status = 'pending' OR s.user_id = ?
             ORDER BY 
                 CASE 
-                    WHEN s.status = 'pending' THEN 1
-                    WHEN s.status = 'approved' THEN 2
-                    ELSE 3 
+                    WHEN s.status = 'pending' THEN 1 
+                    ELSE 2 
                 END,
                 s.created_at DESC
-        """)
+        """, (user_id,))
     else:
         # Usuários normais veem apenas suas próprias sugestões
         cursor.execute("""
@@ -704,9 +704,10 @@ def get_statistics():
     }), 200
 
 @app.route('/api/examples', methods=['GET'])
+@api_token_required
 def get_random_examples():
     # Caminho completo do arquivo
-    file_path = r"C:\Users\bruno\OneDrive\Documentos\tut_projects\recomendator\analises\dataset_transformado_not_lema.csv"
+    file_path = r":/var/www/html/acho-ia/acho/analises/dataset_transformado_not_lema.csv"
     examples_by_category = {}
     
     try:
