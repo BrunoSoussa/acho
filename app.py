@@ -19,7 +19,7 @@ os.mkdir("sql") if not os.path.exists("sql") else None
 GEMINI_KEY = os.getenv("GEMINI_KEY")
 MODEL_NAME = os.getenv("MODEL_NAME")
 DB_PATH = "sql/queries_responses.db"
-JWT_SECRET = os.getenv("JWT_SECRET", "your-secret-key")  # Adicione ao .env
+JWT_SECRET = os.getenv("JWT_SECRET", "your-secret-key") 
 
 
 print(MODEL_NAME)
@@ -471,21 +471,56 @@ def api_search_text():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
-
-@app.route("/get_all_texts", methods=["GET"])
-def api_get_all_texts():
+    
+@app.route("/search_family", methods=["POST"])
+def api_search_family():
     try:
-        output = {}
-        # Itera por cada categoria e suas subcategorias
-        for categoria, subcategorias in mapping_classes.items():
-            subs = []
-            for subcat in subcategorias.values():
-                document = list(subcat.keys())[0]
-                cat_id = list(subcat.values())[0]
-                subs.append({"document": document, "id": cat_id})
-            output[categoria] = subs
-        return jsonify(output), 200
+        data = request.get_json()
+        query = data["query"]
+        query_text = text_processor.preprocess(query)
+        print("Query pré-processada:", query_text)
+
+        # Tokenização e preparação dos inputs para o modelo
+        inputs = tokenizer(
+            [query_text],
+            return_tensors="pt",
+            truncation=True,
+            padding=True,
+            max_length=128,
+        )
+
+        # Realiza a predição com o modelo em modo avaliação
+        model.eval()
+        with torch.no_grad():
+            outputs = model(**inputs)
+            logits = outputs.logits
+            probabilities = torch.softmax(logits, dim=1)
+            # Obtém os 10 melhores resultados
+            values, indices = torch.topk(probabilities, 10, dim=1)
+
+        # Converte as probabilidades e índices para listas utilizáveis
+        rounded_values = [round(val.item(), 2) for val in values[0]]
+        top_labels = [id2label[idx.item()] for idx in indices[0]]
+        print("Top labels:", top_labels)
+        print("Probabilidades:", rounded_values)
+
+        # Percorre todos os rótulos com probabilidade > 0 e busca as famílias correspondentes
+        families_found = {}
+        for i, label in enumerate(top_labels):
+            if rounded_values[i] > 0:
+                # Verifica em cada família se o label está presente
+                for family, subcategories in mapping_classes.items():
+                    if label in subcategories:
+                        # Se a família ainda não foi adicionada, adiciona-a com todas as suas subcategorias
+                        if family not in families_found:
+                            families_found[family] = subcategories
+                        break  # interrompe a busca para este label
+
+        if not families_found:
+            return jsonify({"message": "Nenhuma família encontrada com probabilidade > 0."}), 404
+
+        return jsonify(families_found), 200
+
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
