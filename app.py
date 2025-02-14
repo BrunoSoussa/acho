@@ -524,6 +524,23 @@ def api_search_family():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route("/get_all_texts", methods=["GET"])
+def api_get_all_texts():
+    try:
+        output = {}
+        # Itera por cada categoria e suas subcategorias
+        for categoria, subcategorias in mapping_classes.items():
+            subs = []
+            for subcat in subcategorias.values():
+                document = list(subcat.keys())[0]
+                cat_id = list(subcat.values())[0]
+                subs.append({"document": document, "id": cat_id})
+            output[categoria] = subs
+        return jsonify(output), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
 
 
 @app.route("/get_queries", methods=["GET"])
