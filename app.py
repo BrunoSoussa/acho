@@ -896,6 +896,18 @@ def get_available_tables():
         if 'conn' in locals():
             conn.close()
 
+@app.route("/download_db", methods=["GET"])
+def download_db():
+    try:
+        # Verifica se o banco de dados existe
+        if not os.path.exists(DB_PATH):
+            return jsonify({"error": "Banco de dados não encontrado."}), 404
+
+        # Envia o arquivo do banco de dados como download
+        return send_file(DB_PATH, as_attachment=True, download_name="queries_responses.db")
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 if __name__ == "__main__":
     app.run(debug=True)
 # Salvar no banco de dados

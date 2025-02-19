@@ -77,7 +77,8 @@
   },
   "Educação e Esportes": {
     "crossfit": { "Crossfit": "79" },
-    "reforco escolar": { "Reforço Escolar": "81" }
+    "reforco escolar": { "Reforço Escolar": "81" },
+    "curso de idiomas": { "Curso de Idiomas": "98" },
   },
   "Papelaria e Livraria": {
     "papelaria e escritorio": { "Papelaria": "1" },
