@@ -171,7 +171,7 @@ def create_initial_admin():
     conn.close()
 
 # Adicione esta linha após create_tables() e migrate_database()
-create_initial_admin()
+#create_initial_admin()
 
 def verify_database_structure():
     conn = sqlite3.connect(DB_PATH)
