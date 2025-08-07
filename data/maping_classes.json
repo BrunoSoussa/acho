@@ -73,7 +73,10 @@
     "agencia de marketing": { "Agência de Marketing": "60" },
     "design de produtos": { "Design de Produtos": "62" },
     "grafica": { "Gráfica": "52" },
-    "trabalhos cientificos": { "Trabalhos Ciêntificos": "74" }
+    "trabalhos cientificos": { "Trabalhos Ciêntificos": "74" },
+    "servicos de advocacia": { "Serviços de Advocacia": "99" },
+    "gestao de projetos inovacao": { "Gestão de Projetos Inovação": "100" },
+    "turismo": { "Turismo": "101" }
   },
   "Educação e Esportes": {
     "crossfit": { "Crossfit": "79" },
