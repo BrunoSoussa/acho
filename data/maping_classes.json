@@ -96,7 +96,14 @@
     "suplementos": { "Suplementos": "23" },
     "medicamentos": { "Medicamentos": "24" },
     "servicos odontologicos": { "Serviços Odontologicos": "94" },
-    "servicos cardiologicos": { "Serviços Cardiologicos": "95" }
+    "servicos cardiologicos": { "Serviços Cardiologicos": "95" },
+    "estetica facial maquiagem": { "Estetica Facial e Maquiagem": "107" },
+    "spa bemestar": { "Spa e Bem-Estar": "108" },
+    "corpo depilacao": { "Corpo e Depilação": "109" },
+    "penteados e tratamento capilar": { "Penteados e Tratamento Capilar": "110" },
+    "manicure e pedicure e alongamento": { "Manicure, Pedicure e Alongamento": "111" }
+    
+    
   },
   "Panificação": {
     "equipamentos para panificacao": { "Equipamentos para panificação": "72" },
