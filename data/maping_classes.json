@@ -13,7 +13,8 @@
     "geleia": { "Geleia": "69" },
     "espetinhos": { "Espetinhos": "89" },
     "sorveteria": { "Sorveteria": "80" },
-    "arrumadinhos": { "Quentinhas": "105" }
+    "arrumadinhos": { "Quentinhas": "105" },
+    "docinhos": { "Docinhos": "113" }
   },
   "Moda, Beleza e Acessórios": {
     "moda e acessorios": { "Moda e Acessórios": "6" },
@@ -31,7 +32,8 @@
     "cama mesa e banho": { "Cama, Mesa e Banho": "88" },
     "flores e plantas": { "Flores e Plantas": "42" },
     "luminarias": {"Luminarias":"92"},
-    "solucoes em irrigacao": { "Solucoes em Irrigacao": "93" }
+    "solucoes em irrigacao": { "Solucoes em Irrigacao": "93" },
+    "bordado": { "Bordado": "112" }
   },
   "Construção, Ferramentas e Materiais": {
     "ferramentas e equipamentos": { "Ferramentas": "2" },
