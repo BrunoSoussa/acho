@@ -62,7 +62,9 @@
     "locacao veicular": { "Locação Veicular": "59" },
     "auto escola": { "Auto Escola": "51" },
     "lavagem de veiculos": { "Lavagem de Veiculos": "96" },
-    "estetica automotiva": { "Estetica Automotiva": "97" }
+    "estetica automotiva": { "Estetica Automotiva": "97" },
+    "aplicativo de transporte carro": { "Aplicativo de Transporte - Carro": "115" },
+    "aplicativo de transporte moto": { "Aplicativo de Transporte - Moto": "116" }
   },
   "Serviços Financeiros": {
     "consorcio": { "Consorcio": "63" },
