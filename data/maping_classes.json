@@ -21,7 +21,7 @@
     "moda e acessorios": { "Moda e Acessórios": "6" },
     "beleza e autocuidado": { "Beleza": "14" },
     "joias e bijuterias": { "Joias": "21" },
-    "barbearia": { "cortes de cabelo e barba": "76" },
+    "barbearia": { "Cortes de Cabelo e Barba": "76" },
     "producao de tecidos de malha": { "Produção de Tecidos de Malha": "102" }
   },
   "Óticas": {
@@ -73,7 +73,7 @@
   "Imóveis e Hospedagem": {
     "aluguel de imoveis": { "Aluguel de Imóveis": "65" },
     "venda de imoveis": { "Vendas de Imóveis": "66" },
-    "hospedagem": { "hospedagem": "67" }
+    "hospedagem": { "Hospedagem": "67" }
   },
   "Serviços Profissionais": {
     "servicos de seguros": { "Serviço de Seguros": "68" },
@@ -106,7 +106,7 @@
     "spa bemestar": { "Spa e Bem-Estar": "108" },
     "corpo depilacao": { "Corpo e Depilação": "109" },
     "penteados e tratamento capilar": { "Penteados e Tratamento Capilar": "110" },
-    "manicure e pedicure e alongamento": { "cuidados das unhas": "111" }
+    "manicure e pedicure e alongamento": { "Cuidados das Unhas": "111" }
     
     
   },
