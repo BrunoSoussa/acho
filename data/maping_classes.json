@@ -29,11 +29,12 @@
   },
   "Casa, Decoração e Jardim": {
     "moveis": { "Móveis": "4" },
+    "moveis planejados": { "Móveis Planejados": "117" },
     "decoracao para festas": { "Festas": "11" },
     "cama mesa e banho": { "Cama, Mesa e Banho": "88" },
     "flores e plantas": { "Flores e Plantas": "42" },
-    "luminarias": {"Luminarias":"92"},
-    "solucoes em irrigacao": { "Solucoes em Irrigacao": "93" },
+    "luminarias": {"Luminárias":"92"},
+    "solucoes em irrigacao": { "Soluções em Irrigacao": "93" },
     "bordado": { "Bordado": "112" }
   },
   "Construção, Ferramentas e Materiais": {
@@ -46,7 +47,7 @@
   "Eletrônicos e Tecnologia": {
     "eletronicos e gadgets": { "Eletrônicos": "12" },
     "celulares e smartphones": { "Celulares e Smartphones": "45" },
-    "servico de reparo de eletronicos": { "Serviço de reparo de Eletrônicos": "46" },
+    "servico de reparo de eletronicos": { "Serviço de Reparo de Eletrônicos": "46" },
     "assistencia tecnica em celulares": { "Assistência Têcnica em Celulares": "70" },
     "assistencia tecnica em computadores": { "Assistência Têcnica em Computadores": "71" },
     "servicos de desenvolvimento de software": { "Desenv. Software": "43" }
@@ -55,19 +56,19 @@
     "carros": { "Carros": "13" },
     "baterias automotivas": { "Baterias Automotivas": "50" },
     "refrigeracao automotiva": { "Refrigeração Automotiva": "55" },
-    "troca de oleo": { "Troca de Oleo Automotiva": "61" },
+    "troca de oleo": { "Troca de Óleo Automotiva": "61" },
     "autopecas para carros": { "Autopeças para Carros": "77" },
-    "autopecas para motos": { "Autopeças para motos": "78" },
+    "autopecas para motos": { "Autopeças para Motos": "78" },
     "motos": { "Motos": "82" },
     "locacao veicular": { "Locação Veicular": "59" },
     "auto escola": { "Auto Escola": "51" },
-    "lavagem de veiculos": { "Lavagem de Veiculos": "96" },
-    "estetica automotiva": { "Estetica Automotiva": "97" },
+    "lavagem de veiculos": { "Lavagem de Veículos": "96" },
+    "estetica automotiva": { "Estética Automotiva": "97" },
     "aplicativo de transporte carro": { "Aplicativo de Transporte - Carro": "115" },
     "aplicativo de transporte moto": { "Aplicativo de Transporte - Moto": "116" }
   },
   "Serviços Financeiros": {
-    "consorcio": { "Consorcio": "63" },
+    "consorcio": { "Consórcio": "63" },
     "emprestimos": { "Empréstimos": "90" }
   },
   "Imóveis e Hospedagem": {
@@ -106,12 +107,13 @@
     "spa bemestar": { "Spa e Bem-Estar": "108" },
     "corpo depilacao": { "Corpo e Depilação": "109" },
     "penteados e tratamento capilar": { "Penteados e Tratamento Capilar": "110" },
-    "manicure e pedicure e alongamento": { "Cuidados das Unhas": "111" }
+    "manicure e pedicure e alongamento": { "Cuidados das Unhas": "111" },
+    "produtos naturais e organicos": { "Produtos Naturais e Orgânicos": "118" }
     
     
   },
   "Panificação": {
-    "equipamentos para panificacao": { "Equipamentos para panificação": "72" },
+    "equipamentos para panificacao": { "Equipamentos para Panificação": "72" },
     "ingredientes para panificacao": { "Ingredientes para Panificação": "73" }
   },
   "Entretenimento e Lazer": {
@@ -119,12 +121,12 @@
     "itens de colecao": { "Colecionáveis": "8" },
     "instrumentos musicais": { "Música": "9" },
     "fotografia": { "Fotografia": "18" },
-    "servico de dj": { "DJ": "57" }
+    "servicos musicais": { "Serviços Musicais": "57" }
   },
   "Pets e Animais": {
-    "acessorios para pets": { "Acessorios para Pets": "86" },
-    "racao para pets": { "Racao para Pets": "87" },
-    "servicos veterinarios": { "Servicos Veterinarios": "85" },
+    "acessorios para pets": { "Acessórios para Pets": "86" },
+    "racao para pets": { "Ração para Pets": "87" },
+    "servicos veterinarios": { "Servicos Veterinários": "85" },
     "produtos para equinos": { "Produtos para Equinos": "83" },
     "banho e tosa": { "Banho e Tosa": "91" }
   },
