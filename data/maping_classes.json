@@ -43,6 +43,7 @@
     "construcao civil": { "Construção Civil": "64" },
     "tintas": { "Tintas": "47" },
     "vidros": { "Vidros": "75" }
+
   },
   "Eletrônicos e Tecnologia": {
     "eletronicos e gadgets": { "Eletrônicos": "12" },
@@ -87,7 +88,8 @@
     "turismo": { "Turismo": "101" },
     "produtos e servicos para energia solar": { "Produtos e Serviços para Energia Solar": "103" },
     "servicos contabeis": { "Serviços Contábeis": "104" },
-    "climatizacao e refrigeracao de ambientes": { "Climatização e Refrigeração de Ambientes": "106" }
+    "climatizacao e refrigeracao de ambientes": { "Climatização e Refrigeração de Ambientes": "106" },
+    "madeireira": { "Madeireira": "121" }
   },
   "Educação e Esportes": {
     "crossfit": { "Crossfit": "79" },
@@ -108,7 +110,8 @@
     "corpo depilacao": { "Corpo e Depilação": "109" },
     "penteados e tratamento capilar": { "Penteados e Tratamento Capilar": "110" },
     "manicure e pedicure e alongamento": { "Cuidados das Unhas": "111" },
-    "produtos naturais e organicos": { "Produtos Naturais e Orgânicos": "118" }
+    "produtos naturais e organicos": { "Produtos Naturais e Orgânicos": "118" },
+    "pilates": { "Pilates": "120" }
     
     
   },
@@ -139,5 +142,8 @@
   },
   "Eletrodomésticos": {
     "eletrodomesticos": { "Eletrodomésticos": "20" }
+  },
+  "Suporte":{
+    "suporte": {"Suporte":"119"}
   }
 }
