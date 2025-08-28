@@ -13,11 +13,15 @@ import jwt
 from datetime import datetime, timedelta
 from werkzeug.security import generate_password_hash, check_password_hash
 import random
+import csv
+import io
+from datetime import datetime
 
 load_dotenv()
 os.mkdir("sql") if not os.path.exists("sql") else None
 GEMINI_KEY = os.getenv("GEMINI_KEY")
 MODEL_NAME = os.getenv("MODEL_NAME")
+HF_TOKEN = os.getenv("HF_TOKEN")  # optional: token for private HF repos
 DB_PATH = "sql/queries_responses.db"
 JWT_SECRET = os.getenv("JWT_SECRET", "your-secret-key") 
 
@@ -27,8 +31,15 @@ print(MODEL_NAME)
 
 app = Flask(__name__)
 
-model = BertForSequenceClassification.from_pretrained(MODEL_NAME)
-tokenizer = BertTokenizer.from_pretrained(MODEL_NAME)
+# Ensure MODEL_NAME is configured and support private repos
+if not MODEL_NAME or MODEL_NAME.strip().lower() == 'none':
+    raise RuntimeError(
+        "Missing MODEL_NAME. Set an env var MODEL_NAME with a valid HF repo id or local path to a fine-tuned sequence classification model."
+    )
+
+_auth_kwargs = {"token": HF_TOKEN} if HF_TOKEN else {}
+model = BertForSequenceClassification.from_pretrained(MODEL_NAME, **_auth_kwargs)
+tokenizer = BertTokenizer.from_pretrained(MODEL_NAME, **_auth_kwargs)
 text_processor = TextPipeline()
 
 
@@ -54,6 +65,7 @@ def save_to_db(query, response_data, degree_of_certainty=None):
 
     conn.commit()
     conn.close()
+
 
 def migrate_database():
     conn = sqlite3.connect(DB_PATH)
@@ -86,6 +98,7 @@ def migrate_database():
     
     conn.commit()
     conn.close()
+
 
 def create_tables():
     conn = sqlite3.connect(DB_PATH)
@@ -131,9 +144,30 @@ def create_tables():
     conn.commit()
     conn.close()
 
+
+def ensure_query_response_correction_columns():
+    """Ensure query_response table has columns to store manual corrections.
+    Columns: corrected_category, corrected_category_id, corrected_at
+    """
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    try:
+        cursor.execute("PRAGMA table_info(query_response)")
+        cols = {row[1] for row in cursor.fetchall()}
+        if "corrected_category" not in cols:
+            cursor.execute("ALTER TABLE query_response ADD COLUMN corrected_category TEXT")
+        if "corrected_category_id" not in cols:
+            cursor.execute("ALTER TABLE query_response ADD COLUMN corrected_category_id TEXT")
+        if "corrected_at" not in cols:
+            cursor.execute("ALTER TABLE query_response ADD COLUMN corrected_at TEXT")
+        conn.commit()
+    finally:
+        conn.close()
+
 # Inicialização do banco de dados
 create_tables()
 migrate_database()  # Adicione esta linha para executar a migração
+ensure_query_response_correction_columns()
 
 # Criar um admin inicial se não existir
 def create_initial_admin():
@@ -171,7 +205,7 @@ def create_initial_admin():
     conn.close()
 
 # Adicione esta linha após create_tables() e migrate_database()
-#create_initial_admin()
+create_initial_admin()
 
 def verify_database_structure():
     conn = sqlite3.connect(DB_PATH)
@@ -554,7 +588,17 @@ def get_queries():
         conn.close()
 
         data = [
-            {"id": row[0], "query": row[1], "degree_of_certainty": row[2], "category": row[3], "category_id": row[4], "created_at": row[5]}
+            {
+                "id": row[0],
+                "query": row[1],
+                "degree_of_certainty": row[2],
+                "category": row[3],
+                "category_id": row[4],
+                "created_at": row[5],
+                "corrected_category": row[6] if len(row) > 6 else None,
+                "corrected_category_id": row[7] if len(row) > 7 else None,
+                "corrected_at": row[8] if len(row) > 8 else None,
+            }
             for row in rows
         ]
         return jsonify(data), 200
@@ -896,8 +940,186 @@ def get_available_tables():
         if 'conn' in locals():
             conn.close()
 
+@app.route('/api/searches', methods=['GET'])
+@api_token_required
+def list_searches():
+    """Paginated list of searches with optional week filter (year-week)."""
+    try:
+        limit = int(request.args.get('limit', 50))
+        offset = int(request.args.get('offset', 0))
+        year_week = request.args.get('year_week')  # format YYYY-WW
+        day_date = request.args.get('date')  # format YYYY-MM-DD
 
+        # Validate date if provided
+        if day_date:
+            try:
+                datetime.strptime(day_date, '%Y-%m-%d')
+            except ValueError:
+                return jsonify({'error': 'Parâmetro date inválido. Use YYYY-MM-DD.'}), 400
+
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+
+        base_query = "SELECT id, query, degree_of_certainty, category, category_id, created_at, IFNULL(corrected_category, ''), IFNULL(corrected_category_id, ''), corrected_at FROM query_response"
+        params = []
+        if day_date:
+            base_query += " WHERE DATE(created_at) = ?"
+            params.append(day_date)
+        elif year_week:
+            base_query += " WHERE strftime('%Y-%W', created_at) = ?"
+            params.append(year_week)
+        base_query += " ORDER BY datetime(created_at) DESC LIMIT ? OFFSET ?"
+        params.extend([limit, offset])
+
+        cursor.execute(base_query, params)
+        rows = cursor.fetchall()
+
+        # total count
+        if day_date:
+            cursor.execute("SELECT COUNT(*) FROM query_response WHERE DATE(created_at) = ?", (day_date,))
+        elif year_week:
+            cursor.execute("SELECT COUNT(*) FROM query_response WHERE strftime('%Y-%W', created_at) = ?", (year_week,))
+        else:
+            cursor.execute("SELECT COUNT(*) FROM query_response")
+        total = cursor.fetchone()[0]
+
+        conn.close()
+
+        data = [
+            {
+                'id': r[0],
+                'query': r[1],
+                'degree_of_certainty': r[2],
+                'category': r[3],
+                'category_id': r[4],
+                'created_at': r[5],
+                'corrected_category': r[6] or None,
+                'corrected_category_id': r[7] or None,
+                'corrected_at': r[8],
+            }
+            for r in rows
+        ]
+        return jsonify({'total': total, 'items': data}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/searches/weekly', methods=['GET'])
+@api_token_required
+def searches_weekly():
+    """Return weekly aggregation in format: [{'year_week': '2025-35', 'count': 10}]"""
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        cursor.execute(
+            """
+            SELECT strftime('%Y-%W', created_at) as year_week, COUNT(*) as count
+            FROM query_response
+            GROUP BY year_week
+            ORDER BY year_week DESC
+            """
+        )
+        rows = cursor.fetchall()
+        conn.close()
+        return jsonify([{'year_week': rw[0], 'count': rw[1]} for rw in rows]), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/searches/<int:search_id>/category', methods=['PUT'])
+@api_token_required
+def correct_search_category(search_id):
+    """Admin-only: correct the category/category_id assigned by AI."""
+    try:
+        token = request.cookies.get('token')
+        user_data = jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
+        if not user_data.get('is_admin', False):
+            return jsonify({'message': 'Acesso não autorizado!'}), 403
+
+        body = request.get_json() or {}
+        corrected_category = body.get('corrected_category')
+        corrected_category_id = body.get('corrected_category_id')
+        if not corrected_category or not corrected_category_id:
+            return jsonify({'message': 'Campos corrected_category e corrected_category_id são obrigatórios'}), 400
+
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        cursor.execute(
+            """
+            UPDATE query_response
+            SET corrected_category = ?, corrected_category_id = ?, corrected_at = DATETIME('now')
+            WHERE id = ?
+            """,
+            (corrected_category, corrected_category_id, search_id),
+        )
+        conn.commit()
+        conn.close()
+        return jsonify({'message': 'Categoria corrigida com sucesso!'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/check-auth', methods=['GET'])
+@api_token_required
+def api_check_auth():
+    try:
+        token = request.cookies.get('token')
+        data = jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
+        return jsonify({
+            'authenticated': True,
+            'email': data.get('email'),
+            'is_admin': bool(data.get('is_admin', False))
+        }), 200
+    except Exception:
+        return jsonify({'authenticated': False}), 401
+
+@app.route('/api/searches/export', methods=['GET'])
+@api_token_required
+def export_searches_csv():
+    """Exporta buscas em CSV. Filtro opcional por semana (year_week = YYYY-WW)."""
+    try:
+        year_week = request.args.get('year_week')
+        day_date = request.args.get('date')  # format YYYY-MM-DD
+
+        if day_date:
+            try:
+                datetime.strptime(day_date, '%Y-%m-%d')
+            except ValueError:
+                return jsonify({'error': 'Parâmetro date inválido. Use YYYY-MM-DD.'}), 400
+
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+
+        query = (
+            "SELECT id, query, degree_of_certainty, category, category_id, created_at, "
+            "IFNULL(corrected_category, ''), IFNULL(corrected_category_id, ''), IFNULL(corrected_at, ''), "
+            "strftime('%Y-%W', created_at) as year_week "
+            "FROM query_response"
+        )
+        params = []
+        if day_date:
+            query += " WHERE DATE(created_at) = ?"
+            params.append(day_date)
+        elif year_week:
+            query += " WHERE strftime('%Y-%W', created_at) = ?"
+            params.append(year_week)
+        query += " ORDER BY datetime(created_at) DESC"
+
+        cursor.execute(query, params)
+        rows = cursor.fetchall()
+        conn.close()
+
+        output = io.StringIO()
+        writer = csv.writer(output)
+        writer.writerow([
+            'id','query','degree_of_certainty','category','category_id','created_at',
+            'corrected_category','corrected_category_id','corrected_at','year_week'
+        ])
+        for r in rows:
+            writer.writerow(list(r))
+
+        csv_bytes = io.BytesIO(output.getvalue().encode('utf-8-sig'))
+        filename = f"searches_{day_date if day_date else (year_week if year_week else 'all')}.csv"
+        return send_file(csv_bytes, as_attachment=True, download_name=filename, mimetype='text/csv')
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == "__main__":
     app.run(debug=True)
-# Salvar no banco de dados

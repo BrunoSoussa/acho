@@ -5,9 +5,7 @@ import nltk
 import re
 from unidecode import unidecode
 
-# Baixar stopwords para português, se necessário
 nltk.download("stopwords", quiet=True)
-
 
 class TextPipeline:
     """
@@ -23,8 +21,27 @@ class TextPipeline:
             language_model (str): Modelo spaCy a ser usado.
             stopwords_language (str): Idioma das stopwords a serem carregadas.
         """
-        self.nlp = spacy.load(language_model)
+        self.nlp = self._load_spacy_model(language_model)
         self.stop_words = set(stopwords.words(stopwords_language))
+
+    def _load_spacy_model(self, language_model: str):
+        try:
+            return spacy.load(language_model)
+        except OSError:
+            # Tenta baixar e carregar o modelo solicitado
+            try:
+                from spacy.cli import download
+                download(language_model)
+                return spacy.load(language_model)
+            except Exception:
+                # Fallback para o modelo pequeno
+                fallback = "pt_core_news_sm"
+                try:
+                    return spacy.load(fallback)
+                except OSError:
+                    from spacy.cli import download
+                    download(fallback)
+                    return spacy.load(fallback)
 
     def preprocess(self, text):
         """
@@ -43,4 +60,3 @@ class TextPipeline:
         text = re.sub(r'[^a-zA-Z0-9\s]', '', text)
 
         return text.lower()
-
