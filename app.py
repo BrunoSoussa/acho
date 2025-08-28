@@ -18,14 +18,7 @@ import io
 from datetime import datetime
 
 load_dotenv()
-# Garante que o processo use o diretório do arquivo como cwd, mantendo caminhos relativos consistentes
-PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
-try:
-    os.chdir(PROJECT_DIR)
-except Exception:
-    pass
-# Garante a pasta 'sql' relativa existente
-os.makedirs("sql", exist_ok=True)
+os.mkdir("sql") if not os.path.exists("sql") else None
 GEMINI_KEY = os.getenv("GEMINI_KEY")
 MODEL_NAME = os.getenv("MODEL_NAME")
 HF_TOKEN = os.getenv("HF_TOKEN")  # optional: token for private HF repos
@@ -77,21 +70,34 @@ def save_to_db(query, response_data, degree_of_certainty=None):
 def migrate_database():
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
-    try:
-        # Verifica colunas existentes na tabela users
-        cursor.execute("PRAGMA table_info(users)")
-        cols = {row[1] for row in cursor.fetchall()}
-        if not cols:
-            # Tabela inexistente; criação é tratada por create_tables()
-            return
-        # Adiciona colunas que faltarem sem dropar tabela
-        if "is_admin" not in cols:
-            cursor.execute("ALTER TABLE users ADD COLUMN is_admin BOOLEAN DEFAULT 0")
-        if "created_at" not in cols:
-            cursor.execute("ALTER TABLE users ADD COLUMN created_at TEXT DEFAULT (DATETIME('now'))")
-        conn.commit()
-    finally:
-        conn.close()
+    
+    # Backup dos dados existentes
+    cursor.execute("SELECT email, password FROM users")
+    existing_users = cursor.fetchall()
+    
+    # Dropar a tabela antiga
+    cursor.execute("DROP TABLE IF EXISTS users")
+    
+    # Criar a nova tabela com a coluna is_admin
+    cursor.execute("""
+        CREATE TABLE users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            email TEXT UNIQUE NOT NULL,
+            password TEXT NOT NULL,
+            is_admin BOOLEAN DEFAULT 0,
+            created_at TEXT DEFAULT (DATETIME('now'))
+        )
+    """)
+    
+    # Restaurar os dados existentes
+    for user in existing_users:
+        cursor.execute("""
+            INSERT INTO users (email, password, is_admin)
+            VALUES (?, ?, 0)
+        """, (user[0], user[1]))
+    
+    conn.commit()
+    conn.close()
 
 
 def create_tables():
