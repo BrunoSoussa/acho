@@ -401,6 +401,10 @@ def api_search_text():
         data = request.get_json()
         query = data["query"]
         query_text = text_processor.preprocess(query)
+        if len(query_text) < 3:
+            return jsonify(
+                    {"message": "Não encontrei uma categoria para o produto. Pode descrever melhor?"}
+                ), 404
         print(query_text)
 
         # Tokenizar e predizer

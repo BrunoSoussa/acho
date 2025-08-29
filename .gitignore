@@ -2,7 +2,9 @@
 __pycache__/
 *.py[cod]
 *$py.class
-
+sql\queries_responses.db
+C:\Users\devBr\OneDrive\Área de Trabalho\acho\acho\sql
+C:\Users\devBr\OneDrive\Área de Trabalho\acho\acho\sql\queries_responses.db
 # C extensions
 *.so
 
