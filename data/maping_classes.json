@@ -35,7 +35,8 @@
     "flores e plantas": { "Flores e Plantas": "42" },
     "luminarias": {"Luminárias":"92"},
     "solucoes em irrigacao": { "Soluções em Irrigacao": "93" },
-    "bordado": { "Bordado": "112" }
+    "bordado": { "Bordado": "112" },
+    "utilidades e limpeza": { "Utilidades de Limpeza": "123" }
   },
   "Construção, Ferramentas e Materiais": {
     "ferramentas e equipamentos": { "Ferramentas": "2" },
@@ -66,7 +67,8 @@
     "lavagem de veiculos": { "Lavagem de Veículos": "96" },
     "estetica automotiva": { "Estética Automotiva": "97" },
     "aplicativo de transporte carro": { "Aplicativo de Transporte - Carro": "115" },
-    "aplicativo de transporte moto": { "Aplicativo de Transporte - Moto": "116" }
+    "aplicativo de transporte moto": { "Aplicativo de Transporte - Moto": "116" },
+    "produtos para estetica automotiva": { "Produtos para Estética Automotiva": "124" }
   },
   "Serviços Financeiros": {
     "consorcio": { "Consórcio": "63" },
@@ -135,7 +137,9 @@
   },
   "Utilidades": {
     "gas": { "Gás": "53" },
-    "agua": { "Agua": "54" }
+    "agua": { "Agua": "54" },
+    "embalagens": { "Embalagens": "122" },
+    "descartaveis": { "Descartáveis": "123" }
   },
   "Adultos": {
     "itens para adultos como brinquedos sexuais": { "Sexshop": "17" }

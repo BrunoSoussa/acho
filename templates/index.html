@@ -539,6 +539,35 @@ Content-Type: application/json
                         <div id="weeklySummary" class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4"></div>
                     </div>
                     
+                    <!-- Status e Navegação de Correções -->
+                    <div class="mt-4 border-t pt-4 space-y-3">
+                        <div class="flex flex-wrap items-center gap-3">
+                            <span class="text-sm text-gray-600">Status:</span>
+                            <span id="dayStatusBadge" class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-700">—</span>
+                            <span id="weekStatusBadge" class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-700">—</span>
+                            <div class="ml-auto flex flex-wrap gap-2">
+                                <button id="markDayComplete" class="hidden px-3 py-1.5 text-xs rounded-lg border bg-white hover:bg-gray-50">Marcar dia concluído</button>
+                                <button id="unmarkDayComplete" class="hidden px-3 py-1.5 text-xs rounded-lg border bg-white hover:bg-gray-50">Desmarcar dia</button>
+                                <button id="markWeekComplete" class="hidden px-3 py-1.5 text-xs rounded-lg border bg-white hover:bg-gray-50">Marcar semana concluída</button>
+                                <button id="unmarkWeekComplete" class="hidden px-3 py-1.5 text-xs rounded-lg border bg-white hover:bg-gray-50">Desmarcar semana</button>
+                            </div>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <span class="text-sm text-gray-600">Navegar dias:</span>
+                            <button id="prevPendingDay" class="px-3 py-1.5 text-xs rounded-lg border bg-white hover:bg-gray-50">Anterior pendente</button>
+                            <button id="nextPendingDay" class="px-3 py-1.5 text-xs rounded-lg border bg-white hover:bg-gray-50">Próximo pendente</button>
+                            <button id="prevCompletedDay" class="px-3 py-1.5 text-xs rounded-lg border bg-white hover:bg-gray-50">Anterior concluído</button>
+                            <button id="nextCompletedDay" class="px-3 py-1.5 text-xs rounded-lg border bg-white hover:bg-gray-50">Próximo concluído</button>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <span class="text-sm text-gray-600">Navegar semanas:</span>
+                            <button id="prevPendingWeek" class="px-3 py-1.5 text-xs rounded-lg border bg-white hover:bg-gray-50">Anterior pendente</button>
+                            <button id="nextPendingWeek" class="px-3 py-1.5 text-xs rounded-lg border bg-white hover:bg-gray-50">Próximo pendente</button>
+                            <button id="prevCompletedWeek" class="px-3 py-1.5 text-xs rounded-lg border bg-white hover:bg-gray-50">Anterior concluída</button>
+                            <button id="nextCompletedWeek" class="px-3 py-1.5 text-xs rounded-lg border bg-white hover:bg-gray-50">Próxima concluída</button>
+                        </div>
+                    </div>
+                    
                     <!-- Lista de Buscas -->
                     <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
                         <div class="overflow-x-auto">
@@ -1365,10 +1394,11 @@ Content-Type: application/json
             SEARCHES_STATE.isAdmin = !!auth.is_admin;
             await loadWeeks();
             await loadSearches();
+            await refreshCorrectionStatus();
             // events
             document.getElementById('refreshSearches').onclick = () => loadSearches();
-            document.getElementById('weekFilter').onchange = (e) => { SEARCHES_STATE.yearWeek = e.target.value; SEARCHES_STATE.dayDate = ''; document.getElementById('dateFilter').value = ''; SEARCHES_STATE.offset = 0; loadSearches(); };
-            document.getElementById('dateFilter').onchange = (e) => { SEARCHES_STATE.dayDate = e.target.value; SEARCHES_STATE.yearWeek = ''; document.getElementById('weekFilter').value=''; SEARCHES_STATE.offset = 0; loadSearches(); };
+            document.getElementById('weekFilter').onchange = async (e) => { SEARCHES_STATE.yearWeek = e.target.value; SEARCHES_STATE.dayDate = ''; document.getElementById('dateFilter').value = ''; SEARCHES_STATE.offset = 0; await loadSearches(); await refreshCorrectionStatus(); };
+            document.getElementById('dateFilter').onchange = async (e) => { SEARCHES_STATE.dayDate = e.target.value; SEARCHES_STATE.yearWeek = ''; document.getElementById('weekFilter').value=''; SEARCHES_STATE.offset = 0; await loadSearches(); await refreshCorrectionStatus(); };
             document.getElementById('prevPage').onclick = () => { SEARCHES_STATE.offset = Math.max(0, SEARCHES_STATE.offset - SEARCHES_STATE.limit); loadSearches(); };
             document.getElementById('nextPage').onclick = () => { if (SEARCHES_STATE.offset + SEARCHES_STATE.limit < SEARCHES_STATE.total) { SEARCHES_STATE.offset += SEARCHES_STATE.limit; loadSearches(); } };
             document.getElementById('downloadWeek').onclick = () => {
@@ -1387,6 +1417,12 @@ Content-Type: application/json
                 const url = '/api/searches/export' + `?${params.toString()}`;
                 window.location.href = url;
             };
+
+            // Botões de marcar/desmarcar
+            document.getElementById('markDayComplete').onclick = () => markComplete('day', SEARCHES_STATE.dayDate);
+            document.getElementById('unmarkDayComplete').onclick = () => unmarkComplete('day', SEARCHES_STATE.dayDate);
+            document.getElementById('markWeekComplete').onclick = () => markComplete('week', SEARCHES_STATE.yearWeek);
+            document.getElementById('unmarkWeekComplete').onclick = () => unmarkComplete('week', SEARCHES_STATE.yearWeek);
         }
 
         // Modal para correção de categoria
@@ -1442,7 +1478,10 @@ Content-Type: application/json
                   method: 'PUT',
                   headers: { 'Content-Type': 'application/json' },
                   credentials: 'same-origin',
-                  body: JSON.stringify({ corrected_category, corrected_category_id })
+                  body: JSON.stringify({
+                    corrected_category,
+                    corrected_category_id
+                  })
                 });
                 if (!res.ok) {
                   const t = await res.text().catch(()=> '');
@@ -1460,6 +1499,181 @@ Content-Type: application/json
               if (e.key === 'Escape') { closeModal(); document.removeEventListener('keydown', onKey); }
             });
         }
+
+        async function refreshCorrectionStatus() {
+            try {
+                const params = new URLSearchParams();
+                if (SEARCHES_STATE.dayDate) params.set('date', SEARCHES_STATE.dayDate);
+                if (SEARCHES_STATE.yearWeek) params.set('year_week', SEARCHES_STATE.yearWeek);
+                const res = await fetch(`/api/searches/corrections/status?${params.toString()}`, { credentials: 'same-origin' });
+                const data = await res.json();
+                const dayBadge = document.getElementById('dayStatusBadge');
+                const weekBadge = document.getElementById('weekStatusBadge');
+                // Dia
+                if (!SEARCHES_STATE.dayDate) {
+                    dayBadge.textContent = '—';
+                    dayBadge.className = 'px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-700';
+                } else if (data.day === true) {
+                    dayBadge.textContent = 'Concluído';
+                    dayBadge.className = 'px-2 py-1 text-xs rounded-full bg-green-100 text-green-800';
+                } else {
+                    dayBadge.textContent = 'Pendente';
+                    dayBadge.className = 'px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800';
+                }
+                
+                // Semana
+                if (!SEARCHES_STATE.yearWeek) {
+                    weekBadge.textContent = '—';
+                    weekBadge.className = 'px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-700';
+                } else if (data.week === true) {
+                    weekBadge.textContent = 'Concluída';
+                    weekBadge.className = 'px-2 py-1 text-xs rounded-full bg-green-100 text-green-800';
+                } else {
+                    weekBadge.textContent = 'Pendente';
+                    weekBadge.className = 'px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800';
+                }
+                updateCorrectionButtonsVisibility();
+            } catch (e) {
+                console.error('Falha ao carregar status de correções', e);
+            }
+        }
+
+        function updateCorrectionButtonsVisibility() {
+            const isAdmin = SEARCHES_STATE.isAdmin;
+            const day = SEARCHES_STATE.dayDate;
+            const week = SEARCHES_STATE.yearWeek;
+            const dayBadge = document.getElementById('dayStatusBadge');
+            const weekBadge = document.getElementById('weekStatusBadge');
+            const markDay = document.getElementById('markDayComplete');
+            const unmarkDay = document.getElementById('unmarkDayComplete');
+            const markWeek = document.getElementById('markWeekComplete');
+            const unmarkWeek = document.getElementById('unmarkWeekComplete');
+
+            // Mostrar botões apenas para admin
+            if (isAdmin && day) {
+                markDay.classList.remove('hidden');
+                unmarkDay.classList.remove('hidden');
+            } else {
+                markDay.classList.add('hidden');
+                unmarkDay.classList.add('hidden');
+            }
+            if (isAdmin && week) {
+                markWeek.classList.remove('hidden');
+                unmarkWeek.classList.remove('hidden');
+            } else {
+                markWeek.classList.add('hidden');
+                unmarkWeek.classList.add('hidden');
+            }
+        }
+
+        async function markComplete(type, key) {
+            if (!key) { alert('Seleção vazia.'); return; }
+            try {
+                const res = await fetch('/api/searches/corrections/complete', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({ type, key })
+                });
+                if (!res.ok) throw new Error(await res.text());
+                await refreshCorrectionStatus();
+            } catch (e) {
+                alert('Falha ao marcar como concluído: ' + e.message);
+            }
+        }
+
+        async function unmarkComplete(type, key) {
+            if (!key) { alert('Seleção vazia.'); return; }
+            try {
+                const res = await fetch('/api/searches/corrections/uncomplete', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({ type, key })
+                });
+                if (!res.ok) throw new Error(await res.text());
+                await refreshCorrectionStatus();
+            } catch (e) {
+                alert('Falha ao desmarcar: ' + e.message);
+            }
+        }
+
+        // ===== Helpers de navegação (dias/semanas pendentes/concluídos) =====
+        async function getCompletedSet(type) {
+            try {
+                const res = await fetch(`/api/searches/corrections/list?type=${type}`, { credentials: 'same-origin' });
+                const data = await res.json();
+                return new Set(data.keys || []);
+            } catch { return new Set(); }
+        }
+
+        async function getDailyList(yearWeek) {
+            try {
+                const url = yearWeek ? `/api/searches/daily?year_week=${encodeURIComponent(yearWeek)}` : '/api/searches/daily';
+                const res = await fetch(url, { credentials: 'same-origin' });
+                const rows = await res.json();
+                return rows.map(r => r.day);
+            } catch { return []; }
+        }
+
+        function findNext(current, items, dir, filterSet, wantCompleted) {
+            if (!items || items.length === 0) return null;
+            const idx = current ? items.indexOf(current) : -1;
+            let i = idx;
+            for (let step = 0; step < items.length; step++) {
+                i = (i + dir + items.length) % items.length;
+                const key = items[i];
+                const isCompleted = filterSet.has(key);
+                if ((wantCompleted && isCompleted) || (!wantCompleted && !isCompleted)) return key;
+            }
+            return null;
+        }
+
+        async function gotoNextPrevDay(wantCompleted, dir) {
+            const yearWeek = SEARCHES_STATE.yearWeek || '';
+            const days = await getDailyList(yearWeek);
+            if (days.length === 0) { alert('Sem dias disponíveis para navegar.'); return; }
+            const completed = await getCompletedSet('day');
+            const next = findNext(SEARCHES_STATE.dayDate || days[0], days, dir, completed, wantCompleted);
+            if (!next) { alert('Nenhum dia encontrado.'); return; }
+            SEARCHES_STATE.dayDate = next;
+            document.getElementById('dateFilter').value = next;
+            // Limpar semana se escolher dia específico
+            SEARCHES_STATE.yearWeek = '';
+            document.getElementById('weekFilter').value = '';
+            SEARCHES_STATE.offset = 0;
+            await loadSearches();
+            await refreshCorrectionStatus();
+        }
+
+        async function gotoNextPrevWeek(wantCompleted, dir) {
+            // lista de semanas vem do select weekFilter
+            const weekSelect = document.getElementById('weekFilter');
+            const weeks = Array.from(weekSelect.options).map(o => o.value).filter(Boolean);
+            if (weeks.length === 0) { alert('Sem semanas disponíveis para navegar.'); return; }
+            const completed = await getCompletedSet('week');
+            const current = SEARCHES_STATE.yearWeek || weeks[0];
+            const next = findNext(current, weeks, dir, completed, wantCompleted);
+            if (!next) { alert('Nenhuma semana encontrada.'); return; }
+            SEARCHES_STATE.yearWeek = next;
+            weekSelect.value = next;
+            // limpar dia ao navegar por semana
+            SEARCHES_STATE.dayDate = '';
+            document.getElementById('dateFilter').value = '';
+            SEARCHES_STATE.offset = 0;
+            await loadSearches();
+            await refreshCorrectionStatus();
+        }
+
+        // Navegação
+        document.getElementById('prevPendingDay').onclick = () => gotoNextPrevDay(false, -1);
+        document.getElementById('nextPendingDay').onclick = () => gotoNextPrevDay(false, 1);
+        document.getElementById('prevCompletedDay').onclick = () => gotoNextPrevDay(true, -1);
+        document.getElementById('nextCompletedDay').onclick = () => gotoNextPrevDay(true, 1);
+        document.getElementById('prevPendingWeek').onclick = () => gotoNextPrevWeek(false, -1);
+        document.getElementById('nextPendingWeek').onclick = () => gotoNextPrevWeek(false, 1);
+        document.getElementById('prevCompletedWeek').onclick = () => gotoNextPrevWeek(true, -1);
+        document.getElementById('nextCompletedWeek').onclick = () => gotoNextPrevWeek(true, 1);
     </script>
 </body>
 </html>

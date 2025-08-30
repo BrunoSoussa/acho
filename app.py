@@ -135,6 +135,18 @@ def create_tables():
         )
     """)
     
+    # Tabela de status de correções (dia/semana)
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS correction_status (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            key_type TEXT NOT NULL CHECK (key_type IN ('day','week')),
+            key_value TEXT NOT NULL UNIQUE,
+            completed_by INTEGER,
+            completed_at TEXT DEFAULT (DATETIME('now')),
+            FOREIGN KEY (completed_by) REFERENCES users (id)
+        )
+    """)
+    
     conn.commit()
     conn.close()
 
@@ -1116,6 +1128,155 @@ def export_searches_csv():
         csv_bytes = io.BytesIO(output.getvalue().encode('utf-8-sig'))
         filename = f"searches_{day_date if day_date else (year_week if year_week else 'all')}.csv"
         return send_file(csv_bytes, as_attachment=True, download_name=filename, mimetype='text/csv')
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+# ===== Correções: marcar dia/semana como concluído =====
+def _require_admin():
+    token = request.cookies.get('token')
+    if not token:
+        return False, None
+    try:
+        user_data = jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
+        user_id = user_data.get('user_id')
+        if not user_id:
+            return False, None
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        cursor.execute("SELECT is_admin FROM users WHERE id = ?", (user_id,))
+        row = cursor.fetchone()
+        conn.close()
+        return (bool(row and row[0]), user_id)
+    except Exception:
+        return False, None
+
+@app.route('/api/searches/corrections/status', methods=['GET'])
+@api_token_required
+def get_corrections_status():
+    """Retorna status de conclusão para um dia e/ou semana.
+    Query params: date=YYYY-MM-DD, year_week=YYYY-WW
+    Response: { day: true/false/null, week: true/false/null }
+    """
+    try:
+        day_date = request.args.get('date')
+        year_week = request.args.get('year_week')
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        result = {'day': None, 'week': None}
+        if day_date:
+            cursor.execute("SELECT 1 FROM correction_status WHERE key_type='day' AND key_value=?", (day_date,))
+            result['day'] = cursor.fetchone() is not None
+        if year_week:
+            cursor.execute("SELECT 1 FROM correction_status WHERE key_type='week' AND key_value=?", (year_week,))
+            result['week'] = cursor.fetchone() is not None
+        conn.close()
+        return jsonify(result), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/searches/corrections/complete', methods=['POST'])
+@api_token_required
+def complete_corrections():
+    """Marca um dia ou semana como concluído.
+    Body JSON: { "type": "day|week", "key": "YYYY-MM-DD|YYYY-WW" }
+    Admin only.
+    """
+    is_admin, user_id = _require_admin()
+    if not is_admin:
+        return jsonify({'error': 'Apenas administradores podem concluir correções.'}), 403
+    try:
+        data = request.get_json(force=True)
+        key_type = data.get('type')
+        key_value = data.get('key')
+        if key_type not in ('day','week') or not key_value:
+            return jsonify({'error': 'Parâmetros inválidos'}), 400
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        cursor.execute(
+            "INSERT OR REPLACE INTO correction_status (id, key_type, key_value, completed_by, completed_at)\n             SELECT id, ?, ?, ?, DATETIME('now') FROM (SELECT id FROM correction_status WHERE key_value = ?)\n            ",
+            (key_type, key_value, user_id, key_value)
+        )
+        # Se não existia, faz INSERT normal
+        if cursor.rowcount == 0:
+            cursor.execute(
+                "INSERT INTO correction_status (key_type, key_value, completed_by) VALUES (?, ?, ?)",
+                (key_type, key_value, user_id)
+            )
+        conn.commit()
+        conn.close()
+        return jsonify({'message': 'Marcado como concluído'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/searches/corrections/uncomplete', methods=['POST'])
+@api_token_required
+def uncomplete_corrections():
+    """Desmarca um dia ou semana como concluído.
+    Body JSON: { "type": "day|week", "key": "YYYY-MM-DD|YYYY-WW" }
+    Admin only.
+    """
+    is_admin, _ = _require_admin()
+    if not is_admin:
+        return jsonify({'error': 'Apenas administradores podem concluir correções.'}), 403
+    try:
+        data = request.get_json(force=True)
+        key_type = data.get('type')
+        key_value = data.get('key')
+        if key_type not in ('day','week') or not key_value:
+            return jsonify({'error': 'Parâmetros inválidos'}), 400
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM correction_status WHERE key_type=? AND key_value=?", (key_type, key_value))
+        conn.commit()
+        conn.close()
+        return jsonify({'message': 'Marcado como não concluído'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/searches/daily', methods=['GET'])
+@api_token_required
+def searches_daily():
+    """Retorna agregação diária em formato: [{'day': '2025-08-30', 'count': 12}].
+    Filtro opcional por semana (year_week = YYYY-WW).
+    """
+    try:
+        year_week = request.args.get('year_week')
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        query = (
+            "SELECT DATE(created_at) as day, COUNT(*) as count "
+            "FROM query_response "
+        )
+        params = []
+        if year_week:
+            query += "WHERE strftime('%Y-%W', created_at) = ? "
+            params.append(year_week)
+        query += "GROUP BY day ORDER BY day DESC"
+        cursor.execute(query, params)
+        rows = cursor.fetchall()
+        conn.close()
+        return jsonify([{'day': r[0], 'count': r[1]} for r in rows]), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/searches/corrections/list', methods=['GET'])
+@api_token_required
+def list_corrections_keys():
+    """Lista chaves concluídas de correções por tipo.
+    Query params: type=day|week
+    Response: { keys: ["YYYY-MM-DD" | "YYYY-WW", ...] }
+    """
+    try:
+        key_type = request.args.get('type')
+        if key_type not in ('day', 'week'):
+            return jsonify({'error': 'Parâmetro type inválido. Use day ou week.'}), 400
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        cursor.execute("SELECT key_value FROM correction_status WHERE key_type = ? ORDER BY key_value DESC", (key_type,))
+        keys = [r[0] for r in cursor.fetchall()]
+        conn.close()
+        return jsonify({'keys': keys}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
