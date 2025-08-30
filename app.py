@@ -29,11 +29,12 @@ os.makedirs("sql", exist_ok=True)
 GEMINI_KEY = os.getenv("GEMINI_KEY")
 MODEL_NAME = os.getenv("MODEL_NAME")
 HF_TOKEN = os.getenv("HF_TOKEN")  # optional: token for private HF repos
-DB_PATH = "sql/queries_responses.db"
+DB_PATH = os.getenv("DB_PATH", os.path.join(PROJECT_DIR, "sql", "queries_responses.db"))
 JWT_SECRET = os.getenv("JWT_SECRET", "your-secret-key") 
 
 
 print(MODEL_NAME)
+print(f"[startup] DB_PATH em uso: {DB_PATH}")
 
 
 app = Flask(__name__)
@@ -330,7 +331,9 @@ def login():
             }, JWT_SECRET)
             
             response = jsonify({'token': token})
-            response.set_cookie('token', token, httponly=True, secure=True, samesite='Strict')
+            cookie_secure = os.getenv('COOKIE_SECURE', 'false').lower() == 'true'
+            # SameSite=Lax ajuda a manter o cookie em navegações dentro do mesmo site quando atrás de proxy sem HTTPS
+            response.set_cookie('token', token, httponly=True, secure=cookie_secure, samesite='Lax')
             return response, 200
         else:
             print("Senha incorreta!")
