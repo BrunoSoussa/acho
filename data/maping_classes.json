@@ -36,7 +36,8 @@
     "luminarias": {"Luminárias":"92"},
     "solucoes em irrigacao": { "Soluções em Irrigacao": "93" },
     "bordado": { "Bordado": "112" },
-    "utilidades e limpeza": { "Utilidades de Limpeza": "123" }
+    "utilidades e limpeza": { "Utilidades de Limpeza": "123" },
+    "cozinha e utensilios": { "Cozinha e Utensílios": "126" }
   },
   "Construção, Ferramentas e Materiais": {
     "ferramentas e equipamentos": { "Ferramentas": "2" },
@@ -68,7 +69,8 @@
     "estetica automotiva": { "Estética Automotiva": "97" },
     "aplicativo de transporte carro": { "Aplicativo de Transporte - Carro": "115" },
     "aplicativo de transporte moto": { "Aplicativo de Transporte - Moto": "116" },
-    "produtos para estetica automotiva": { "Produtos para Estética Automotiva": "124" }
+    "produtos para estetica automotiva": { "Produtos para Estética Automotiva": "124" },
+    "borracharia": { "Borracharia": "125" }
   },
   "Serviços Financeiros": {
     "consorcio": { "Consórcio": "63" },
