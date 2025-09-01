@@ -151,5 +151,9 @@
   },
   "Suporte":{
     "suporte": {"Suporte":"119"}
+  },
+  "Camping":{
+    "produtos de camping": {"Produtos de Camping":"128"},
+    "produtos para pesca": {"Produtos para Pesca":"129"}
   }
 }
