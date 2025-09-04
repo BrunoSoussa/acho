@@ -42,7 +42,7 @@ with open(MAPPING_PATH, "r", encoding="utf-8") as f:
 
 
 genai.configure(api_key=GEMINI_KEY)
-GEMINI_MODEL_NAME = os.getenv("GEMINI_MODEL", "gemini-1.5-flash")
+GEMINI_MODEL_NAME = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
 gemini_model = genai.GenerativeModel(GEMINI_MODEL_NAME)
 
 def save_to_db(query, response_data, degree_of_certainty=None):
