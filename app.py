@@ -22,7 +22,9 @@ try:
     os.chdir(PROJECT_DIR)
 except Exception:
     pass
-os.makedirs("sql", exist_ok=True)
+try:
+    pass
+os.makedirs(os.path.join(PROJECT_DIR, "sql"), exist_ok=True)
 GEMINI_KEY = os.getenv("GEMINI_KEY")
 DB_PATH = os.getenv("DB_PATH", os.path.join(PROJECT_DIR, "sql", "queries_responses.db"))
 JWT_SECRET = os.getenv("JWT_SECRET", "your-secret-key") 
