@@ -35,7 +35,7 @@ app = Flask(__name__)
 
 text_processor = TextPipeline()
 
-MAPPING_PATH = r"data/maping_classes.json"
+MAPPING_PATH = os.path.join(PROJECT_DIR, "data", "maping_classes.json")
 MAPPING_LOCK = threading.Lock()
 with open(MAPPING_PATH, "r", encoding="utf-8") as f:
     mapping_classes = json.load(f)
