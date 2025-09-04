@@ -99,6 +99,11 @@
                             class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
                         Buscas
                     </button>
+                    <button @click="changeTab('categories')"
+                            :class="{ 'border-primary-500 text-primary-600': activeTab === 'categories' }"
+                            class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                        Categorias
+                    </button>
                 </nav>
             </div>
 
@@ -554,17 +559,17 @@ Content-Type: application/json
                         </div>
                         <div class="flex flex-wrap items-center gap-2">
                             <span class="text-sm text-gray-600">Navegar dias:</span>
-                            <button id="prevPendingDay" class="px-3 py-1.5 text-xs rounded-lg border bg-white hover:bg-gray-50">Anterior pendente</button>
-                            <button id="nextPendingDay" class="px-3 py-1.5 text-xs rounded-lg border bg-white hover:bg-gray-50">Próximo pendente</button>
-                            <button id="prevCompletedDay" class="px-3 py-1.5 text-xs rounded-lg border bg-white hover:bg-gray-50">Anterior concluído</button>
-                            <button id="nextCompletedDay" class="px-3 py-1.5 text-xs rounded-lg border bg-white hover:bg-gray-50">Próximo concluído</button>
+                            <button id="prevPendingDay" class="px-3 py-1.5 text-sm rounded-lg border bg-white hover:bg-gray-50">Anterior pendente</button>
+                            <button id="nextPendingDay" class="px-3 py-1.5 text-sm rounded-lg border bg-white hover:bg-gray-50">Próximo pendente</button>
+                            <button id="prevCompletedDay" class="px-3 py-1.5 text-sm rounded-lg border bg-white hover:bg-gray-50">Anterior concluído</button>
+                            <button id="nextCompletedDay" class="px-3 py-1.5 text-sm rounded-lg border bg-white hover:bg-gray-50">Próximo concluído</button>
                         </div>
                         <div class="flex flex-wrap items-center gap-2">
                             <span class="text-sm text-gray-600">Navegar semanas:</span>
-                            <button id="prevPendingWeek" class="px-3 py-1.5 text-xs rounded-lg border bg-white hover:bg-gray-50">Anterior pendente</button>
-                            <button id="nextPendingWeek" class="px-3 py-1.5 text-xs rounded-lg border bg-white hover:bg-gray-50">Próximo pendente</button>
-                            <button id="prevCompletedWeek" class="px-3 py-1.5 text-xs rounded-lg border bg-white hover:bg-gray-50">Anterior concluída</button>
-                            <button id="nextCompletedWeek" class="px-3 py-1.5 text-xs rounded-lg border bg-white hover:bg-gray-50">Próxima concluída</button>
+                            <button id="prevPendingWeek" class="px-3 py-1.5 text-sm rounded-lg border bg-white hover:bg-gray-50">Anterior pendente</button>
+                            <button id="nextPendingWeek" class="px-3 py-1.5 text-sm rounded-lg border bg-white hover:bg-gray-50">Próximo pendente</button>
+                            <button id="prevCompletedWeek" class="px-3 py-1.5 text-sm rounded-lg border bg-white hover:bg-gray-50">Anterior concluída</button>
+                            <button id="nextCompletedWeek" class="px-3 py-1.5 text-sm rounded-lg border bg-white hover:bg-gray-50">Próxima concluída</button>
                         </div>
                     </div>
                     
@@ -593,6 +598,62 @@ Content-Type: application/json
                                 <button id="prevPage" class="px-3 py-1.5 text-sm rounded-lg border bg-white hover:bg-gray-50">Anterior</button>
                                 <button id="nextPage" class="px-3 py-1.5 text-sm rounded-lg border bg-white hover:bg-gray-50">Próxima</button>
                             </div>
+                        </div>
+                    </div>
+                </div>
+                <div x-show="activeTab === 'categories'" class="space-y-6">
+                    <h2 class="text-2xl font-bold text-gray-900">Gerenciar Categorias</h2>
+                    
+                    <!-- Formulário: Criar nova categoria -->
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                        <div class="p-6">
+                            <form id="categoryCreateForm" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div>
+                                    <label for="catFamily" class="block text-sm font-medium text-gray-700 mb-1">
+                                        Família
+                                    </label>
+                                    <input type="text" id="catFamily" class="w-full border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500" placeholder="Ex: Serviços" required>
+                                </div>
+                                <div>
+                                    <label for="catLabel" class="block text-sm font-medium text-gray-700 mb-1">
+                                        Label
+                                    </label>
+                                    <input type="text" id="catLabel" class="w-full border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500" placeholder="Ex: Banho e tosa" required>
+                                </div>
+                                <div>
+                                    <label for="catDocument" class="block text-sm font-medium text-gray-700 mb-1">
+                                        Document
+                                    </label>
+                                    <input type="text" id="catDocument" class="w-full border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500" placeholder="Ex: Serviços para animais de estimação" required>
+                                </div>
+                                <div class="md:col-span-3 flex justify-end">
+                                    <button type="submit" class="inline-flex items-center px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white text-sm font-medium rounded-lg">
+                                        Criar
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    
+                    <!-- Lista de Categorias -->
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                        <div class="p-4 flex items-center justify-between">
+                            <h3 class="text-lg font-medium text-gray-900">Categorias</h3>
+                            <button id="refreshCategories" class="px-3 py-1.5 text-sm rounded-lg border bg-white hover:bg-gray-50">Atualizar</button>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Família</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Label</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Document</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="categoriesTableBody" class="bg-white divide-y divide-gray-200"></tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -735,7 +796,7 @@ Content-Type: application/json
                     <div class="bg-red-50 border-l-4 border-red-400 p-4">
                         <div class="flex">
                             <div class="flex-shrink-0">
-                                <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                                <svg class="h-5 w-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 20 20" fill="currentColor">
                                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
                                 </svg>
                             </div>
@@ -826,7 +887,7 @@ Content-Type: application/json
             try {
                 await fetch(`/api/suggestions/${id}`, {
                     method: 'PUT',
-                    headers: {
+                    headers: { 
                         'Content-Type': 'application/json',
                     },
                     credentials: 'same-origin',
@@ -910,6 +971,9 @@ Content-Type: application/json
                                 break;
                             case 'searches':
                                 await loadSearchesTab();
+                                break;
+                            case 'categories':
+                                await loadCategoriesTab();
                                 break;
                         }
                     } catch (error) {
@@ -1152,148 +1216,125 @@ Content-Type: application/json
                         <p class="text-sm font-medium text-gray-900">${query}</p>
                         <p class="text-sm text-gray-500">${result.document}</p>
                     </div>
-                    <span class="px-2 py-1 text-xs font-medium rounded-full ${certaintyClass}">
-                        ${certainty}
-                    </span>
+                    <span class="px-2 py-1 text-xs font-medium rounded-full ${certaintyClass}">${certainty}</span>
                 </div>
             `;
             
-            historyDiv.insertBefore(historyItem, historyDiv.firstChild);
+            historyDiv.prepend(historyItem);
         }
 
-        // Adicionar listener ao formulário
-        document.getElementById('searchTestForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const query = document.getElementById('searchQuery').value;
-            if (query) {
-                await performSearch(query);
-                document.getElementById('searchQuery').value = '';
-            }
-        });
-
-        // Adicione uma função para atualização automática do dashboard
-        function startDashboardAutoUpdate() {
-            // Auto-update desativado
-        }
-
-        // Auto-update desativado: não iniciar automaticamente
-
-        // Adicione os event listeners para os filtros
-        document.addEventListener('DOMContentLoaded', () => {
-            const userFilter = document.getElementById('userFilter');
-            const statusFilter = document.getElementById('statusFilter');
-            
-            if (userFilter) {
-                userFilter.addEventListener('change', () => {
-                    console.log('Filtro de usuário alterado:', userFilter.value);
-                    loadSuggestions();
-                });
-            }
-            
-            if (statusFilter) {
-                statusFilter.addEventListener('change', () => {
-                    console.log('Filtro de status alterado:', statusFilter.value);
-                    loadSuggestions();
-                });
-            }
-        });
-
-        // Adicione a função loadTableData
-        async function loadTableData() {
-            const tableSelect = document.getElementById('tableSelect');
-            const loading = document.getElementById('tableLoading');
-            const tableHeader = document.getElementById('tableHeader');
-            const tableBody = document.getElementById('tableBody');
-            
-            if (!tableSelect || !loading || !tableHeader || !tableBody) {
-                console.error('Elementos da tabela não encontrados');
-                return;
-            }
-            
+        // Adicione a função loadCategoriesTab
+        async function loadCategoriesTab() {
             try {
-                loading.classList.remove('hidden');
-                tableHeader.innerHTML = '';
-                tableBody.innerHTML = '';
-                
-                const response = await fetch(`/api/database/${tableSelect.value}`, {
-                    credentials: 'same-origin',
-                    headers: {
-                        'Accept': 'application/json'
-                    }
-                });
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                // Carregar lista
+                await refreshCategoriesList();
+                // Bind do formulário apenas uma vez
+                const form = document.getElementById('categoryCreateForm');
+                if (form && !form.dataset.bound) {
+                    form.addEventListener('submit', handleCreateCategory);
+                    document.getElementById('refreshCategories').addEventListener('click', refreshCategoriesList);
+                    form.dataset.bound = 'true';
                 }
-                
-                const data = await response.json();
-                console.log('Dados recebidos:', data); // Debug
-                
-                if (!data.columns || !data.rows) {
-                    throw new Error('Formato de dados inválido');
+            } catch (e) {
+                console.error('Erro ao carregar a aba de categorias:', e);
+            }
+        }
+
+        // Adicione a função refreshCategoriesList
+        async function refreshCategoriesList() {
+            const tbody = document.getElementById('categoriesTableBody');
+            if (!tbody) return;
+            tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-4 text-sm text-gray-500">Carregando...</td></tr>';
+            try {
+                const res = await fetch('/api/categories', { credentials: 'same-origin' });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Erro ao listar categorias');
+                if (!Array.isArray(data)) throw new Error('Resposta inesperada');
+                if (data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-4 text-sm text-gray-500">Nenhuma categoria encontrada.</td></tr>';
+                    return;
                 }
-                
-                // Criar cabeçalho
-                tableHeader.innerHTML = `
+                tbody.innerHTML = data.map(cat => `
                     <tr>
-                        ${data.columns.map(column => `
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                ${column}
-                            </th>
-                        `).join('')}
-                    </tr>
-                `;
-                
-                // Criar linhas de dados
-                if (data.rows.length === 0) {
-                    tableBody.innerHTML = `
-                        <tr>
-                            <td colspan="${data.columns.length}" class="px-6 py-4 text-center text-sm text-gray-500">
-                                Nenhum dado encontrado
-                            </td>
-                        </tr>
-                    `;
-                } else {
-                    tableBody.innerHTML = data.rows.map(row => `
-                        <tr class="hover:bg-gray-50">
-                            ${Object.values(row).map(value => `
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    ${value === null ? '<span class="text-gray-400">null</span>' : 
-                                      typeof value === 'boolean' ? (value ? 'Sim' : 'Não') :
-                                      typeof value === 'string' && value.length > 100 ? value.substring(0, 100) + '...' :
-                                      value}
-                                </td>
-                            `).join('')}
-                        </tr>
-                    `).join('');
-                }
-                
-            } catch (error) {
-                console.error('Erro ao carregar dados:', error);
-                const errorMessage = `
-                    <tr>
-                        <td colspan="${data?.columns?.length || 1}" class="px-6 py-4 text-center">
-                            <div class="bg-red-50 border-l-4 border-red-400 p-4">
-                                <div class="flex">
-                                    <div class="flex-shrink-0">
-                                        <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
-                                        </svg>
-                                    </div>
-                                    <div class="ml-3">
-                                        <p class="text-sm text-red-700">
-                                            Erro ao carregar dados. Por favor, tente novamente.
-                                            ${error.message ? `<br><span class="text-xs">${error.message}</span>` : ''}
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${cat.family}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${cat.label}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${cat.document}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${cat.id}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 space-x-2">
+                            <button class="px-3 py-1.5 text-xs rounded-lg border bg-white hover:bg-gray-50" onclick='editCategory(${JSON.stringify(cat)})'>Editar</button>
+                            <button class="px-3 py-1.5 text-xs rounded-lg text-white bg-red-500 hover:bg-red-600" onclick='deleteCategory("${cat.id}")'>Excluir</button>
                         </td>
                     </tr>
-                `;
-                tableBody.innerHTML = errorMessage;
-            } finally {
-                loading.classList.add('hidden');
+                `).join('');
+            } catch (e) {
+                console.error(e);
+                tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-4 text-sm text-red-600">${e.message}</td></tr>`;
+            }
+        }
+
+        // Adicione a função handleCreateCategory
+        async function handleCreateCategory(ev) {
+            ev.preventDefault();
+            const family = document.getElementById('catFamily').value.trim();
+            const label = document.getElementById('catLabel').value.trim();
+            const documentName = document.getElementById('catDocument').value.trim();
+            if (!family || !label || !documentName) return;
+            try {
+                const res = await fetch('/api/categories', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({ family, label, document: documentName })
+                });
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok) throw new Error(data.error || 'Falha ao criar categoria');
+                // Limpa formulário e atualiza
+                ev.target.reset();
+                await refreshCategoriesList();
+                alert(`Categoria criada com sucesso (ID: ${data.id || '—'})`);
+            } catch (e) {
+                alert(e.message);
+            }
+        }
+
+        // Adicione a função editCategory
+        async function editCategory(cat) {
+            try {
+                const newFamily = prompt('Família:', cat.family);
+                if (newFamily === null) return;
+                const newLabel = prompt('Label:', cat.label);
+                if (newLabel === null) return;
+                const newDocument = prompt('Document:', cat.document);
+                if (newDocument === null) return;
+                const res = await fetch(`/api/categories/${encodeURIComponent(cat.id)}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({ family: newFamily.trim(), label: newLabel.trim(), document: newDocument.trim() })
+                });
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok) throw new Error(data.error || 'Falha ao editar categoria');
+                await refreshCategoriesList();
+                alert('Categoria atualizada com sucesso');
+            } catch (e) {
+                alert(e.message);
+            }
+        }
+
+        // Adicione a função deleteCategory
+        async function deleteCategory(id) {
+            if (!confirm('Tem certeza que deseja excluir esta categoria?')) return;
+            try {
+                const res = await fetch(`/api/categories/${encodeURIComponent(id)}`, {
+                    method: 'DELETE',
+                    credentials: 'same-origin'
+                });
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok) throw new Error(data.error || 'Falha ao excluir categoria');
+                await refreshCategoriesList();
+                alert('Categoria removida com sucesso');
+            } catch (e) {
+                alert(e.message);
             }
         }
 
@@ -1674,6 +1715,23 @@ Content-Type: application/json
         document.getElementById('nextPendingWeek').onclick = () => gotoNextPrevWeek(false, 1);
         document.getElementById('prevCompletedWeek').onclick = () => gotoNextPrevWeek(true, -1);
         document.getElementById('nextCompletedWeek').onclick = () => gotoNextPrevWeek(true, 1);
+    </script>
+    <script>
+        (function bindSearchForm(){
+            const form = document.getElementById('searchTestForm');
+            if (!form || form.dataset.bound) return;
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const input = document.getElementById('searchQuery');
+                const query = (input?.value || '').trim();
+                if (!query) { 
+                    input?.focus();
+                    return; 
+                }
+                await performSearch(query);
+            });
+            form.dataset.bound = 'true';
+        })();
     </script>
 </body>
 </html>

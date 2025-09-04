@@ -1,159 +1,385 @@
 {
   "Alimentos e Bebidas": {
-    "peixaria e pescados": { "Peixaria": "25" },
-    "bebidas alcoolicas": { "Bebidas": "26" },
-    "paes": { "Pães": "27" },
-    "doces e chocolates": { "Chocolates": "29" },
-    "pizzaria": { "Pizzaria": "41" },
-    "hortifruti": { "Hortifruti": "48" },
-    "acougue": { "Açougue": "49" },
-    "salgados": { "Salgados": "56" },
-    "sushi": { "Sushi": "58" },
-    "hamburgueres": { "Hambúrgueres": "84" },
-    "geleia": { "Geleia": "69" },
-    "espetinhos": { "Espetinhos": "89" },
-    "sorveteria": { "Sorveteria": "80" },
-    "arrumadinhos": { "Quentinhas": "105" },
-    "docinhos": { "Docinhos": "113" },
-    "massas": { "Massas": "114" }
+    "peixaria e pescados": {
+      "Peixaria": "25"
+    },
+    "bebidas alcoolicas": {
+      "Bebidas": "26"
+    },
+    "paes": {
+      "Pães": "27"
+    },
+    "doces e chocolates": {
+      "Chocolates": "29"
+    },
+    "pizzaria": {
+      "Pizzaria": "41"
+    },
+    "hortifruti": {
+      "Hortifruti": "48"
+    },
+    "acougue": {
+      "Açougue": "49"
+    },
+    "salgados": {
+      "Salgados": "56"
+    },
+    "sushi": {
+      "Sushi": "58"
+    },
+    "hamburgueres": {
+      "Hambúrgueres": "84"
+    },
+    "geleia": {
+      "Geleia": "69"
+    },
+    "espetinhos": {
+      "Espetinhos": "89"
+    },
+    "sorveteria": {
+      "Sorveteria": "80"
+    },
+    "arrumadinhos": {
+      "Quentinhas": "105"
+    },
+    "docinhos": {
+      "Docinhos": "113"
+    },
+    "massas": {
+      "Massas": "114"
+    }
   },
   "Moda, Beleza e Acessórios": {
-    "moda e acessorios": { "Moda e Acessórios": "6" },
-    "beleza e autocuidado": { "Beleza": "14" },
-    "joias e bijuterias": { "Joias": "21" },
-    "barbearia": { "Cortes de Cabelo e Barba": "76" },
-    "producao de tecidos de malha": { "Produção de Tecidos de Malha": "102" }
+    "moda e acessorios": {
+      "Moda e Acessórios": "6"
+    },
+    "beleza e autocuidado": {
+      "Beleza": "14"
+    },
+    "joias e bijuterias": {
+      "Joias": "21"
+    },
+    "barbearia": {
+      "Cortes de Cabelo e Barba": "76"
+    },
+    "producao de tecidos de malha": {
+      "Produção de Tecidos de Malha": "102"
+    }
   },
   "Óticas": {
-    "oculos e itens para oculos": { "Óticas": "0" }
+    "oculos e itens para oculos": {
+      "Óticas": "0"
+    }
   },
   "Casa, Decoração e Jardim": {
-    "moveis": { "Móveis": "4" },
-    "moveis planejados": { "Móveis Planejados": "117" },
-    "decoracao para festas": { "Festas": "11" },
-    "cama mesa e banho": { "Cama, Mesa e Banho": "88" },
-    "flores e plantas": { "Flores e Plantas": "42" },
-    "luminarias": {"Luminárias":"92"},
-    "solucoes em irrigacao": { "Soluções em Irrigacao": "93" },
-    "bordado": { "Bordado": "112" },
-    "utilidades e limpeza": { "Utilidades de Limpeza": "127" },
-    "cozinha e utensilios": { "Cozinha e Utensílios": "126" }
+    "moveis": {
+      "Móveis": "4"
+    },
+    "moveis planejados": {
+      "Móveis Planejados": "117"
+    },
+    "decoracao para festas": {
+      "Festas": "11"
+    },
+    "cama mesa e banho": {
+      "Cama, Mesa e Banho": "88"
+    },
+    "flores e plantas": {
+      "Flores e Plantas": "42"
+    },
+    "luminarias": {
+      "Luminárias": "92"
+    },
+    "solucoes em irrigacao": {
+      "Soluções em Irrigacao": "93"
+    },
+    "bordado": {
+      "Bordado": "112"
+    },
+    "utilidades e limpeza": {
+      "Utilidades de Limpeza": "127"
+    },
+    "cozinha e utensilios": {
+      "Cozinha e Utensílios": "126"
+    }
   },
   "Construção, Ferramentas e Materiais": {
-    "ferramentas e equipamentos": { "Ferramentas": "2" },
-    "materiais de construcao": { "Material de Construção": "7" },
-    "construcao civil": { "Construção Civil": "64" },
-    "tintas": { "Tintas": "47" },
-    "vidros": { "Vidros": "75" }
-
+    "ferramentas e equipamentos": {
+      "Ferramentas": "2"
+    },
+    "materiais de construcao": {
+      "Material de Construção": "7"
+    },
+    "construcao civil": {
+      "Construção Civil": "64"
+    },
+    "tintas": {
+      "Tintas": "47"
+    },
+    "vidros": {
+      "Vidros": "75"
+    }
   },
   "Eletrônicos e Tecnologia": {
-    "eletronicos e gadgets": { "Eletrônicos": "12" },
-    "celulares e smartphones": { "Celulares e Smartphones": "45" },
-    "servico de reparo de eletronicos": { "Serviço de Reparo de Eletrônicos": "46" },
-    "assistencia tecnica em celulares": { "Assistência Têcnica em Celulares": "70" },
-    "assistencia tecnica em computadores": { "Assistência Têcnica em Computadores": "71" },
-    "servicos de desenvolvimento de software": { "Desenv. Software": "43" }
+    "eletronicos e gadgets": {
+      "Eletrônicos": "12"
+    },
+    "celulares e smartphones": {
+      "Celulares e Smartphones": "45"
+    },
+    "servico de reparo de eletronicos": {
+      "Serviço de Reparo de Eletrônicos": "46"
+    },
+    "assistencia tecnica em celulares": {
+      "Assistência Têcnica em Celulares": "70"
+    },
+    "assistencia tecnica em computadores": {
+      "Assistência Têcnica em Computadores": "71"
+    },
+    "servicos de desenvolvimento de software": {
+      "Desenv. Software": "43"
+    }
   },
   "Automotivo": {
-    "carros": { "Carros": "13" },
-    "baterias automotivas": { "Baterias Automotivas": "50" },
-    "refrigeracao automotiva": { "Refrigeração Automotiva": "55" },
-    "troca de oleo": { "Troca de Óleo Automotiva": "61" },
-    "autopecas para carros": { "Autopeças para Carros": "77" },
-    "autopecas para motos": { "Autopeças para Motos": "78" },
-    "motos": { "Motos": "82" },
-    "locacao veicular": { "Locação Veicular": "59" },
-    "auto escola": { "Auto Escola": "51" },
-    "lavagem de veiculos": { "Lavagem de Veículos": "96" },
-    "estetica automotiva": { "Estética Automotiva": "97" },
-    "aplicativo de transporte carro": { "Aplicativo de Transporte - Carro": "115" },
-    "aplicativo de transporte moto": { "Aplicativo de Transporte - Moto": "116" },
-    "produtos para estetica automotiva": { "Produtos para Estética Automotiva": "124" },
-    "borracharia": { "Borracharia": "125" }
+    "carros": {
+      "Carros": "13"
+    },
+    "baterias automotivas": {
+      "Baterias Automotivas": "50"
+    },
+    "refrigeracao automotiva": {
+      "Refrigeração Automotiva": "55"
+    },
+    "troca de oleo": {
+      "Troca de Óleo Automotiva": "61"
+    },
+    "autopecas para carros": {
+      "Autopeças para Carros": "77"
+    },
+    "autopecas para motos": {
+      "Autopeças para Motos": "78"
+    },
+    "motos": {
+      "Motos": "82"
+    },
+    "locacao veicular": {
+      "Locação Veicular": "59"
+    },
+    "auto escola": {
+      "Auto Escola": "51"
+    },
+    "lavagem de veiculos": {
+      "Lavagem de Veículos": "96"
+    },
+    "estetica automotiva": {
+      "Estética Automotiva": "97"
+    },
+    "aplicativo de transporte carro": {
+      "Aplicativo de Transporte - Carro": "115"
+    },
+    "aplicativo de transporte moto": {
+      "Aplicativo de Transporte - Moto": "116"
+    },
+    "produtos para estetica automotiva": {
+      "Produtos para Estética Automotiva": "124"
+    },
+    "borracharia": {
+      "Borracharia": "125"
+    }
   },
   "Serviços Financeiros": {
-    "consorcio": { "Consórcio": "63" },
-    "emprestimos": { "Empréstimos": "90" }
+    "consorcio": {
+      "Consórcio": "63"
+    },
+    "emprestimos": {
+      "Empréstimos": "90"
+    }
   },
   "Imóveis e Hospedagem": {
-    "aluguel de imoveis": { "Aluguel de Imóveis": "65" },
-    "venda de imoveis": { "Vendas de Imóveis": "66" },
-    "hospedagem": { "Hospedagem": "67" }
+    "aluguel de imoveis": {
+      "Aluguel de Imóveis": "65"
+    },
+    "venda de imoveis": {
+      "Vendas de Imóveis": "66"
+    },
+    "hospedagem": {
+      "Hospedagem": "67"
+    }
   },
   "Serviços Profissionais": {
-    "servicos de seguros": { "Serviço de Seguros": "68" },
-    "agencia de marketing": { "Agência de Marketing": "60" },
-    "design de produtos": { "Design de Produtos": "62" },
-    "grafica": { "Gráfica": "52" },
-    "trabalhos cientificos": { "Trabalhos Ciêntificos": "74" },
-    "servicos de advocacia": { "Serviços de Advocacia": "99" },
-    "gestao de projetos inovacao": { "Gestão de Projetos Inovação": "100" },
-    "turismo": { "Turismo": "101" },
-    "produtos e servicos para energia solar": { "Produtos e Serviços para Energia Solar": "103" },
-    "servicos contabeis": { "Serviços Contábeis": "104" },
-    "climatizacao e refrigeracao de ambientes": { "Climatização e Refrigeração de Ambientes": "106" },
-    "madeireira": { "Madeireira": "121" }
+    "servicos de seguros": {
+      "Serviço de Seguros": "68"
+    },
+    "agencia de marketing": {
+      "Agência de Marketing": "60"
+    },
+    "design de produtos": {
+      "Design de Produtos": "62"
+    },
+    "grafica": {
+      "Gráfica": "52"
+    },
+    "trabalhos cientificos": {
+      "Trabalhos Ciêntificos": "74"
+    },
+    "servicos de advocacia": {
+      "Serviços de Advocacia": "99"
+    },
+    "gestao de projetos inovacao": {
+      "Gestão de Projetos Inovação": "100"
+    },
+    "turismo": {
+      "Turismo": "101"
+    },
+    "produtos e servicos para energia solar": {
+      "Produtos e Serviços para Energia Solar": "103"
+    },
+    "servicos contabeis": {
+      "Serviços Contábeis": "104"
+    },
+    "climatizacao e refrigeracao de ambientes": {
+      "Climatização e Refrigeração de Ambientes": "106"
+    },
+    "madeireira": {
+      "Madeireira": "121"
+    }
   },
   "Educação e Esportes": {
-    "crossfit": { "Crossfit": "79" },
-    "reforco escolar": { "Reforço Escolar": "81" },
-    "curso de idiomas": { "Curso de Idiomas": "98" }
+    "crossfit": {
+      "Crossfit": "79"
+    },
+    "reforco escolar": {
+      "Reforço Escolar": "81"
+    },
+    "curso de idiomas": {
+      "Curso de Idiomas": "98"
+    }
   },
   "Papelaria e Livraria": {
-    "papelaria e escritorio": { "Papelaria": "1" },
-    "livros e materiais literarios": { "Livros": "22" }
+    "papelaria e escritorio": {
+      "Papelaria": "1"
+    },
+    "livros e materiais literarios": {
+      "Livros": "22"
+    }
   },
   "Saúde e Bem-Estar": {
-    "suplementos": { "Suplementos": "23" },
-    "medicamentos": { "Medicamentos": "24" },
-    "servicos odontologicos": { "Serviços Odontologicos": "94" },
-    "servicos cardiologicos": { "Serviços Cardiologicos": "95" },
-    "estetica facial maquiagem": { "Estetica Facial e Maquiagem": "107" },
-    "spa bemestar": { "Spa e Bem-Estar": "108" },
-    "corpo depilacao": { "Corpo e Depilação": "109" },
-    "penteados e tratamento capilar": { "Penteados e Tratamento Capilar": "110" },
-    "manicure e pedicure e alongamento": { "Cuidados das Unhas": "111" },
-    "produtos naturais e organicos": { "Produtos Naturais e Orgânicos": "118" },
-    "pilates": { "Pilates": "120" }
-    
-    
+    "suplementos": {
+      "Suplementos": "23"
+    },
+    "medicamentos": {
+      "Medicamentos": "24"
+    },
+    "servicos odontologicos": {
+      "Serviços Odontologicos": "94"
+    },
+    "servicos cardiologicos": {
+      "Serviços Cardiologicos": "95"
+    },
+    "estetica facial maquiagem": {
+      "Estetica Facial e Maquiagem": "107"
+    },
+    "spa bemestar": {
+      "Spa e Bem-Estar": "108"
+    },
+    "corpo depilacao": {
+      "Corpo e Depilação": "109"
+    },
+    "penteados e tratamento capilar": {
+      "Penteados e Tratamento Capilar": "110"
+    },
+    "manicure e pedicure e alongamento": {
+      "Cuidados das Unhas": "111"
+    },
+    "produtos naturais e organicos": {
+      "Produtos Naturais e Orgânicos": "118"
+    },
+    "pilates": {
+      "Pilates": "120"
+    }
   },
   "Panificação": {
-    "equipamentos para panificacao": { "Equipamentos para Panificação": "72" },
-    "ingredientes para panificacao": { "Ingredientes para Panificação": "73" }
+    "equipamentos para panificacao": {
+      "Equipamentos para Panificação": "72"
+    },
+    "ingredientes para panificacao": {
+      "Ingredientes para Panificação": "73"
+    }
   },
   "Entretenimento e Lazer": {
-    "brinquedos e jogos educativos": { "Brinquedos": "3" },
-    "itens de colecao": { "Colecionáveis": "8" },
-    "instrumentos musicais": { "Música": "9" },
-    "fotografia": { "Fotografia": "18" },
-    "servicos musicais": { "Serviços Musicais": "57" }
+    "brinquedos e jogos educativos": {
+      "Brinquedos": "3"
+    },
+    "itens de colecao": {
+      "Colecionáveis": "8"
+    },
+    "instrumentos musicais": {
+      "Música": "9"
+    },
+    "fotografia": {
+      "Fotografia": "18"
+    },
+    "servicos musicais": {
+      "Serviços Musicais": "57"
+    }
   },
   "Pets e Animais": {
-    "acessorios para pets": { "Acessórios para Pets": "86" },
-    "racao para pets": { "Ração para Pets": "87" },
-    "servicos veterinarios": { "Servicos Veterinários": "85" },
-    "produtos para equinos": { "Produtos para Equinos": "83" },
-    "banho e tosa": { "Banho e Tosa": "91" }
+    "acessorios para pets": {
+      "Acessórios para Pets": "86"
+    },
+    "racao para pets": {
+      "Ração para Pets": "87"
+    },
+    "servicos veterinarios": {
+      "Servicos Veterinários": "85"
+    },
+    "produtos para equinos": {
+      "Produtos para Equinos": "83"
+    },
+    "banho e tosa": {
+      "Banho e Tosa": "91"
+    }
   },
   "Utilidades": {
-    "gas": { "Gás": "53" },
-    "agua": { "Agua": "54" },
-    "embalagens": { "Embalagens": "122" },
-    "descartaveis": { "Descartáveis": "123" }
+    "gas": {
+      "Gás": "53"
+    },
+    "agua": {
+      "Agua": "54"
+    },
+    "embalagens": {
+      "Embalagens": "122"
+    },
+    "descartaveis": {
+      "Descartáveis": "123"
+    }
   },
   "Adultos": {
-    "itens para adultos como brinquedos sexuais": { "Sexshop": "17" }
+    "itens para adultos como brinquedos sexuais": {
+      "Sexshop": "17"
+    }
   },
   "Eletrodomésticos": {
-    "eletrodomesticos": { "Eletrodomésticos": "20" }
+    "eletrodomesticos": {
+      "Eletrodomésticos": "20"
+    }
   },
-  "Suporte":{
-    "suporte": {"Suporte":"119"}
+  "Suporte": {
+    "suporte": {
+      "Suporte": "119"
+    }
   },
-  "Camping":{
-    "produtos de camping": {"Produtos de Camping":"128"},
-    "produtos para pesca": {"Produtos para Pesca":"129"}
+  "Camping": {
+    "produtos de camping": {
+      "Produtos de Camping": "128"
+    },
+    "produtos para pesca": {
+      "Produtos para Pesca": "129"
+    }
+  },
+  "lazer": {
+    "piscinas e materiais para piscinas": {
+      "Piscinas e Materiais para Psicinas": "130"
+    }
   }
 }

@@ -1,6 +1,4 @@
 from flask import Flask, request, jsonify, render_template, redirect, url_for
-from transformers import BertForSequenceClassification, BertTokenizer
-import torch
 from data.pipeline import TextPipeline
 import google.generativeai as genai
 import json
@@ -16,48 +14,36 @@ import random
 import csv
 import io
 from datetime import datetime
+import threading
 
 load_dotenv()
-# Garante que o processo use o diretório do arquivo como cwd, mantendo caminhos relativos consistentes
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 try:
     os.chdir(PROJECT_DIR)
 except Exception:
     pass
-# Garante a pasta 'sql' relativa existente
 os.makedirs("sql", exist_ok=True)
 GEMINI_KEY = os.getenv("GEMINI_KEY")
-MODEL_NAME = os.getenv("MODEL_NAME")
-HF_TOKEN = os.getenv("HF_TOKEN")  # optional: token for private HF repos
 DB_PATH = os.getenv("DB_PATH", os.path.join(PROJECT_DIR, "sql", "queries_responses.db"))
 JWT_SECRET = os.getenv("JWT_SECRET", "your-secret-key") 
 
 
-print(MODEL_NAME)
 print(f"[startup] DB_PATH em uso: {DB_PATH}")
 
 
 app = Flask(__name__)
 
-# Ensure MODEL_NAME is configured and support private repos
-if not MODEL_NAME or MODEL_NAME.strip().lower() == 'none':
-    raise RuntimeError(
-        "Missing MODEL_NAME. Set an env var MODEL_NAME with a valid HF repo id or local path to a fine-tuned sequence classification model."
-    )
-
-_auth_kwargs = {"token": HF_TOKEN} if HF_TOKEN else {}
-model = BertForSequenceClassification.from_pretrained(MODEL_NAME, **_auth_kwargs)
-tokenizer = BertTokenizer.from_pretrained(MODEL_NAME, **_auth_kwargs)
 text_processor = TextPipeline()
 
-
-id2label = model.config.id2label
-with open(r"data/maping_classes.json", "r", encoding="utf-8") as f:
+MAPPING_PATH = r"data/maping_classes.json"
+MAPPING_LOCK = threading.Lock()
+with open(MAPPING_PATH, "r", encoding="utf-8") as f:
     mapping_classes = json.load(f)
 
 
 genai.configure(api_key=GEMINI_KEY)
-gemini_model = genai.GenerativeModel("gemini-1.5-flash")
+GEMINI_MODEL_NAME = os.getenv("GEMINI_MODEL", "gemini-1.5-flash")
+gemini_model = genai.GenerativeModel(GEMINI_MODEL_NAME)
 
 def save_to_db(query, response_data, degree_of_certainty=None):
     conn = sqlite3.connect(DB_PATH)
@@ -79,13 +65,10 @@ def migrate_database():
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     try:
-        # Verifica colunas existentes na tabela users
         cursor.execute("PRAGMA table_info(users)")
         cols = {row[1] for row in cursor.fetchall()}
         if not cols:
-            # Tabela inexistente; criação é tratada por create_tables()
             return
-        # Adiciona colunas que faltarem sem dropar tabela
         if "is_admin" not in cols:
             cursor.execute("ALTER TABLE users ADD COLUMN is_admin BOOLEAN DEFAULT 0")
         if "created_at" not in cols:
@@ -99,7 +82,6 @@ def create_tables():
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     
-    # Tabela de queries
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS query_response (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -111,7 +93,6 @@ def create_tables():
         )
     """)
     
-    # Tabela de usuários
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -122,7 +103,6 @@ def create_tables():
         )
     """)
     
-    # Tabela de sugestões
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS suggestions (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -136,7 +116,6 @@ def create_tables():
         )
     """)
     
-    # Tabela de status de correções (dia/semana)
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS correction_status (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -153,9 +132,6 @@ def create_tables():
 
 
 def ensure_query_response_correction_columns():
-    """Ensure query_response table has columns to store manual corrections.
-    Columns: corrected_category, corrected_category_id, corrected_at
-    """
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     try:
@@ -171,12 +147,10 @@ def ensure_query_response_correction_columns():
     finally:
         conn.close()
 
-# Inicialização do banco de dados
 create_tables()
-migrate_database()  # Adicione esta linha para executar a migração
+migrate_database()  
 ensure_query_response_correction_columns()
 
-# Criar um admin inicial se não existir
 def create_initial_admin():
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
@@ -184,12 +158,10 @@ def create_initial_admin():
     admin_email = "brunosilvasousapi@gmail.com"
     admin_password = "3kpz5f5f"
     
-    # Verificar se já existe um admin
     cursor.execute("SELECT * FROM users WHERE email = ?", (admin_email,))
     admin = cursor.fetchone()
     
     if admin:
-        # Atualizar para ter certeza que é admin
         cursor.execute("""
             UPDATE users 
             SET is_admin = 1 
@@ -197,7 +169,6 @@ def create_initial_admin():
         """, (admin_email,))
         print(f"Admin existente atualizado: {admin_email}")
     else:
-        # Criar novo admin
         hashed_password = generate_password_hash(admin_password)
         cursor.execute("""
             INSERT INTO users (email, password, is_admin)
@@ -211,21 +182,18 @@ def create_initial_admin():
     conn.commit()
     conn.close()
 
-# Adicione esta linha após create_tables() e migrate_database()
 create_initial_admin()
 
 def verify_database_structure():
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     
-    # Verificar estrutura da tabela users
     cursor.execute("PRAGMA table_info(users)")
     columns = cursor.fetchall()
     print("\nEstrutura da tabela users:")
     for col in columns:
         print(f"Coluna: {col}")
     
-    # Verificar dados existentes
     cursor.execute("SELECT * FROM users")
     users = cursor.fetchall()
     print("\nUsuários existentes:")
@@ -234,8 +202,6 @@ def verify_database_structure():
     
     conn.close()
 
-
-# Adicione esta linha após create_tables() e migrate_database()
 verify_database_structure()
 
 def token_required(f):
@@ -247,10 +213,8 @@ def token_required(f):
             return jsonify({'message': 'Token ausente!'}), 401
         
         try:
-            token = token.split(' ')[1]  # Remove 'Bearer ' do token
+            token = token.split(' ')[1]  
             data = jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
-            
-            # Você pode adicionar verificação de usuário aqui se necessário
             
         except jwt.ExpiredSignatureError:
             return jsonify({'message': 'Token expirado!'}), 401
@@ -299,7 +263,6 @@ def login():
     if not email or not password:
         return jsonify({'message': 'Dados incompletos!'}), 400
     
-    # Verificar token de admin se necessário
     if is_admin:
         if not admin_token or admin_token != os.getenv('ADMIN_TOKEN'):
             print(f"Token admin inválido. Recebido: {admin_token}")
@@ -309,14 +272,13 @@ def login():
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     
-    # Buscar usuário
     cursor.execute("SELECT * FROM users WHERE email = ?", (email,))
     user = cursor.fetchone()
     
     print(f"Usuário encontrado: {user}")
     
     if user:
-        is_user_admin = bool(user[3])  # Coluna is_admin
+        is_user_admin = bool(user[3])  
         print(f"Usuário é admin: {is_user_admin}")
         
         if is_admin and not is_user_admin:
@@ -332,7 +294,6 @@ def login():
             
             response = jsonify({'token': token})
             cookie_secure = os.getenv('COOKIE_SECURE', 'false').lower() == 'true'
-            # SameSite=Lax ajuda a manter o cookie em navegações dentro do mesmo site quando atrás de proxy sem HTTPS
             response.set_cookie('token', token, httponly=True, secure=cookie_secure, samesite='Lax')
             return response, 200
         else:
@@ -352,23 +313,22 @@ def register():
     email = data.get('email')
     password = data.get('password')
     
-    print(f"Tentativa de registro - Email: {email}")  # Debug
+    print(f"Tentativa de registro - Email: {email}")  
     
     if not email or not password:
         return jsonify({'message': 'Dados incompletos!'}), 400
     
     hashed_password = generate_password_hash(password)
-    print(f"Hash gerado: {hashed_password}")  # Debug
+    print(f"Hash gerado: {hashed_password}")  
     
     try:
         conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
         
-        # Verificar se o email já existe
         cursor.execute("SELECT * FROM users WHERE email = ?", (email,))
         existing_user = cursor.fetchone()
         if existing_user:
-            print(f"Email já existe: {existing_user}")  # Debug
+            print(f"Email já existe: {existing_user}")  
             return jsonify({'message': 'Email já registrado!'}), 400
         
         cursor.execute("""
@@ -376,20 +336,19 @@ def register():
             VALUES (?, ?)
         """, (email, hashed_password))
         
-        # Verificar se o usuário foi criado corretamente
         cursor.execute("SELECT * FROM users WHERE email = ?", (email,))
         new_user = cursor.fetchone()
-        print(f"Novo usuário criado: {new_user}")  # Debug
-        
+        print(f"Novo usuário criado: {new_user}")  
+    
         conn.commit()
         conn.close()
         
         return jsonify({'message': 'Usuário registrado com sucesso!'}), 201
     except sqlite3.IntegrityError as e:
-        print(f"Erro de integridade: {e}")  # Debug
+        print(f"Erro de integridade: {e}")  
         return jsonify({'message': 'Email já registrado!'}), 400
     except Exception as e:
-        print(f"Erro inesperado: {e}")  # Debug
+        print(f"Erro inesperado: {e}")  
         return jsonify({'message': str(e)}), 500
 
 def api_token_required(f):
@@ -414,159 +373,131 @@ def api_token_required(f):
 def api_search_text():
     try:
         data = request.get_json()
-        query = data["query"]
+        query = data.get("query", "")
         query_text = text_processor.preprocess(query)
         if len(query_text) < 3:
             return jsonify(
-                    {"message": "Não encontrei uma categoria para o produto. Pode descrever melhor?"}
-                ), 404
-        print(query_text)
+                {"message": "Não encontrei uma categoria para o produto. Pode descrever melhor?"}
+            ), 404
 
-        # Tokenizar e predizer
-        inputs = tokenizer(
-            [query_text],
-            return_tensors="pt",
-            truncation=True,
-            padding=True,
-            max_length=128,
+        options = []
+        for group in mapping_classes.values():
+            for subcat in group.values():
+                document = list(subcat.keys())[0]
+                cat_id = str(list(subcat.values())[0])
+                options.append({"document": document, "id": cat_id})
+
+        if not options:
+            return jsonify({"error": "Catálogo de categorias vazio."}), 500
+
+        system_instruction = (
+            "Você é um classificador de intenção de compra. Dado um texto do usuário e uma lista de opções de categorias, "
+            "selecione a opção mais adequada. Responda SOMENTE com JSON estrito."
         )
-        model.eval()
-        with torch.no_grad():
-            outputs = model(**inputs)
-            logits = outputs.logits
-            probabilities = torch.softmax(logits, dim=1)
-            values, indices = torch.topk(probabilities, 10, dim=1)
-
-        rounded_values = [round(value.item(), 2) for value in values[0]]
-        print(rounded_values)
-        top_labels = [id2label[idx.item()] for idx in indices[0]]
-        print(top_labels)
-
-        # Atualiza a extração dos dados a partir da nova estrutura de mapping_classes
-        top_results = []
-        for i, label in enumerate(top_labels):
-            subcat_mapping = None
-            # Procura pela subcategoria em cada grupo
-            for group in mapping_classes.values():
-                if label in group:
-                    subcat_mapping = group[label]
-                    break
-            if subcat_mapping:
-                document = list(subcat_mapping.keys())[0]
-                cat_id = list(subcat_mapping.values())[0]
-            else:
-                document = ""
-                cat_id = ""
-            top_results.append({
-                "document": document,
-                "id": cat_id,
-                "degree_of_certainty": rounded_values[i],
-            })
-
-        # Se o grau de certeza do primeiro resultado for suficientemente alto, salva e retorna
-        if top_results[0]["degree_of_certainty"] >= 0.9:
-            save_to_db(query, top_results[0], top_results[0]["degree_of_certainty"])
-            return jsonify(top_results[0]), 200
-
-        filtered_results = [
-            {"document": item["document"], "id": item["id"]}
-            for item in top_results
-            if item["degree_of_certainty"] > 0
-        ]
-        print(f"filtered results: {filtered_results}")
-
         prompt = f"""
-        Você é um modelo especializado em detecção de intenção de compra.
-        A intenção do usuário é: "{query}".
-        As categorias disponíveis são: {filtered_results}.
-        Retorne o ID da categoria mais adequada em formato JSON, com uma única chave 'ID' e o valor correspondente à categoria.
-        Se nenhuma categoria for apropriada, retorne "None" nuncar retorne uma categoria que não não tiver nada relacionado
-        com intenção do usuário.
-        Não adicione formatação ou metadados extras.
+        Texto do usuário: "{query}"
+        Opções (lista de objetos com document e id): {json.dumps(options, ensure_ascii=False)}
+
+        Regras:
+        - Retorne estritamente um JSON no formato: {{"document": string, "id": string, "degree_of_certainty": number entre 0 e 1}}
+        - Se nenhuma opção for apropriada, retorne: {{"None": true}}
+        - Não adicione comentários, blocos markdown, ou chaves extras.
+        - O campo id deve ser exatamente um dos ids presentes nas opções.
+        - O campo document deve corresponder exatamente ao document da opção escolhida.
         """
         try:
             response = gemini_model.generate_content(prompt)
-            response_text = response.text.strip().replace("```json", "").replace("```", "")
+            response_text = response.text.strip()
+            cleaned = response_text.replace("```json", "").replace("```", "").strip()
 
-            if response_text == "None":
+            try:
+                result = json.loads(cleaned)
+            except json.JSONDecodeError:
+                return jsonify({"error": "Erro ao interpretar a resposta do Gemini."}), 502
+
+            if isinstance(result, dict) and result.get("None") is True:
                 return jsonify(
                     {"message": "Não encontrei uma categoria para o produto. Pode descrever melhor?"}
                 ), 404
 
+            if not all(k in result for k in ["document", "id", "degree_of_certainty"]):
+                return jsonify({"error": "Resposta do Gemini incompleta."}), 502
+
+            picked = next((o for o in options if o["id"] == str(result["id"]) and o["document"] == result["document"]), None)
+            if not picked:
+                return jsonify({"error": "ID/document retornado não corresponde às opções."}), 404
+
             try:
-                category_data = json.loads(response_text)
-                category_id = category_data.get("ID")
-                matching_document = next(
-                    (result for result in top_results if result["id"] == str(category_id)),
-                    None,
-                )
+                certainty = float(result["degree_of_certainty"])
+                certainty = max(0.0, min(1.0, certainty))
+            except Exception:
+                certainty = None
 
-                if matching_document:
-                    save_to_db(query, matching_document, matching_document.get("degree_of_certainty", None))
-                    return jsonify(matching_document), 200
-                else:
-                    return jsonify(
-                        {"message": "ID retornado pelo modelo não encontrado nos resultados."}
-                    ), 404
+            payload = {
+                "document": picked["document"],
+                "id": picked["id"],
+                "degree_of_certainty": certainty,
+            }
 
-            except json.JSONDecodeError:
-                return jsonify({"error": "Erro ao interpretar a resposta do modelo."}), 500
+            save_to_db(query, payload, certainty)
+            return jsonify(payload), 200
         except Exception as e:
-            # Em caso de erro na chamada do modelo Gemini, salva e retorna o primeiro resultado
-            save_to_db(query, top_results[0], top_results[0].get("degree_of_certainty", None))
-            return jsonify(top_results[0]), 202
+            return jsonify({"error": f"Falha ao consultar o Gemini: {str(e)}"}), 502
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-    
+
 @app.route("/search_family", methods=["POST"])
 def api_search_family():
     try:
         data = request.get_json()
-        query = data["query"]
+        query = data.get("query", "")
         query_text = text_processor.preprocess(query)
-        print("Query pré-processada:", query_text)
+        if len(query_text) < 3:
+            return jsonify({"message": "Descreva melhor sua busca."}), 400
 
-        # Tokenização e preparação dos inputs para o modelo
-        inputs = tokenizer(
-            [query_text],
-            return_tensors="pt",
-            truncation=True,
-            padding=True,
-            max_length=128,
+        families = {}
+        for family, subcategories in mapping_classes.items():
+            families[family] = list(subcategories.keys())
+
+        system_instruction = (
+            "Dada uma consulta do usuário e famílias com suas subcategorias (nomes), "
+            "selecione as famílias mais relevantes. Responda SOMENTE com JSON."
         )
+        prompt = f"""
+        Texto do usuário: "{query}"
+        Famílias disponíveis (mapa família -> lista de subcategorias): {json.dumps(families, ensure_ascii=False)}
 
-        # Realiza a predição com o modelo em modo avaliação
-        model.eval()
-        with torch.no_grad():
-            outputs = model(**inputs)
-            logits = outputs.logits
-            probabilities = torch.softmax(logits, dim=1)
-            # Obtém os 10 melhores resultados
-            values, indices = torch.topk(probabilities, 10, dim=1)
+        Regras:
+        - Retorne estritamente um JSON no formato: {{"families": [string]}} com até 5 famílias mais relevantes.
+        - Se nenhuma família for apropriada, retorne: {{"families": []}}.
+        - Não adicione comentários, blocos markdown, nem chaves extras.
+        """
+        try:
+            response = gemini_model.generate_content(prompt)
+            response_text = response.text.strip()
+            cleaned = response_text.replace("```json", "").replace("```", "").strip()
 
-        # Converte as probabilidades e índices para listas utilizáveis
-        rounded_values = [round(val.item(), 2) for val in values[0]]
-        top_labels = [id2label[idx.item()] for idx in indices[0]]
-        print("Top labels:", top_labels)
-        print("Probabilidades:", rounded_values)
+            try:
+                result = json.loads(cleaned)
+            except json.JSONDecodeError:
+                return jsonify({"error": "Erro ao interpretar a resposta do Gemini."}), 502
 
-        # Percorre todos os rótulos com probabilidade > 0 e busca as famílias correspondentes
-        families_found = {}
-        for i, label in enumerate(top_labels):
-            if rounded_values[i] > 0:
-                # Verifica em cada família se o label está presente
-                for family, subcategories in mapping_classes.items():
-                    if label in subcategories:
-                        # Se a família ainda não foi adicionada, adiciona-a com todas as suas subcategorias
-                        if family not in families_found:
-                            families_found[family] = subcategories
-                        break  # interrompe a busca para este label
+            fam_list = result.get("families", []) if isinstance(result, dict) else []
+            if not isinstance(fam_list, list):
+                fam_list = []
 
-        if not families_found:
-            return jsonify({"message": "Nenhuma família encontrada com probabilidade > 0."}), 404
+            fam_list = [f for f in fam_list if f in mapping_classes]
+            if not fam_list:
+                return jsonify({"message": "Nenhuma família encontrada com a consulta."}), 404
 
-        return jsonify(families_found), 200
+            families_found = {}
+            for f in fam_list:
+                families_found[f] = mapping_classes[f]
+
+            return jsonify(families_found), 200
+        except Exception as e:
+            return jsonify({"error": f"Falha ao consultar o Gemini: {str(e)}"}), 502
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -575,7 +506,6 @@ def api_search_family():
 def api_get_all_texts():
     try:
         output = {}
-        # Itera por cada categoria e suas subcategorias
         for categoria, subcategorias in mapping_classes.items():
             subs = []
             for subcat in subcategorias.values():
@@ -586,9 +516,6 @@ def api_get_all_texts():
         return jsonify(output), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
-
-
 
 @app.route("/get_queries", methods=["GET"])
 #@token_required
@@ -618,18 +545,13 @@ def get_queries():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-
-
-
 @app.route("/download_db", methods=["GET"])
 @token_required
 def download_db():
     try:
-        # Verifica se o banco de dados existe
         if not os.path.exists(DB_PATH):
             return jsonify({"error": "Banco de dados não encontrado."}), 404
 
-        # Envia o arquivo do banco de dados como download
         return send_file(DB_PATH, as_attachment=True, download_name="queries_responses.db")
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -670,7 +592,6 @@ def get_suggestions():
     cursor = conn.cursor()
     
     if is_admin:
-        # Admins veem todas as sugestões pendentes e suas próprias
         cursor.execute("""
             SELECT s.*, u.email 
             FROM suggestions s
@@ -684,7 +605,6 @@ def get_suggestions():
                 s.created_at DESC
         """, (user_id,))
     else:
-        # Usuários normais veem apenas suas próprias sugestões
         cursor.execute("""
             SELECT s.*, NULL as email
             FROM suggestions s
@@ -765,7 +685,6 @@ def get_statistics():
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     
-    # Buscar top categorias mais pesquisadas
     cursor.execute("""
         SELECT category, COUNT(*) as count 
         FROM query_response 
@@ -776,11 +695,9 @@ def get_statistics():
     """)
     top_categories = cursor.fetchall()
     
-    # Buscar total de pesquisas
     cursor.execute("SELECT COUNT(*) FROM query_response")
     total_searches = cursor.fetchone()[0]
     
-    # Buscar média de certeza
     cursor.execute("""
         SELECT AVG(degree_of_certainty) 
         FROM query_response 
@@ -788,7 +705,6 @@ def get_statistics():
     """)
     avg_certainty = cursor.fetchone()[0]
     
-    # Buscar pesquisas recentes
     cursor.execute("""
         SELECT query, category, degree_of_certainty, created_at
         FROM query_response
@@ -814,12 +730,10 @@ def get_statistics():
 @app.route('/api/examples', methods=['GET'])
 @api_token_required
 def get_random_examples():
-    # Caminho completo do arquivo
     file_path = r"analises/dataset_transformado_not_lema.csv"
     examples_by_category = {}
     
     try:
-        # Verificar se o arquivo existe
         if not os.path.exists(file_path):
             print(f"Arquivo não encontrado: {file_path}")
             return jsonify({"error": "Arquivo de exemplos não encontrado"}), 404
@@ -827,20 +741,16 @@ def get_random_examples():
         print(f"Lendo arquivo: {file_path}")
         
         with open(file_path, 'r', encoding='utf-8') as file:
-            # Pular o cabeçalho
             header = next(file)
             print(f"Cabeçalho: {header.strip()}")
             
-            # Processar cada linha
             line_count = 0
             for line in file:
                 line_count += 1
                 if line.strip():
                     try:
-                        # Dividir a linha usando vírgula
                         texto, label = line.strip().split(',')
                         
-                        # Remover aspas se existirem
                         texto = texto.strip('"').strip()
                         label = label.strip('"').strip()
                         
@@ -857,7 +767,6 @@ def get_random_examples():
                         print(f"Erro: {str(e)}")
                         continue
         
-        # Debug: imprimir quantidade de exemplos por categoria
         print("\nQuantidade de exemplos por categoria:")
         for label, examples in examples_by_category.items():
             print(f"{label}: {len(examples)} exemplos")
@@ -866,14 +775,12 @@ def get_random_examples():
             print("Nenhum exemplo foi carregado")
             return jsonify({"error": "Nenhum exemplo foi carregado"}), 500
         
-        # Selecionar 5 exemplos aleatórios de cada categoria
         random_examples = {}
         for label, texts in examples_by_category.items():
-            if texts:  # Verificar se há exemplos na categoria
+            if texts:  
                 sample_size = min(5, len(texts))
                 random_examples[label] = random.sample(texts, sample_size)
         
-        # Debug: verificar resultado final
         print("\nCategorias no resultado final:", len(random_examples))
         print("Primeiras categorias:", list(random_examples.keys())[:3])
         
@@ -885,10 +792,9 @@ def get_random_examples():
         traceback.print_exc()
         return jsonify({"error": f"Erro ao processar exemplos: {str(e)}"}), 500
 
-@app.route('/api/database/<table_name>', methods=['GET'])
+@app.route("/api/database/<table_name>", methods=["GET"])
 @token_required
 def get_table_data(table_name):
-    # Validar nome da tabela para evitar SQL injection
     allowed_tables = {'query_response', 'users', 'suggestions'}
     if table_name not in allowed_tables:
         return jsonify({'error': 'Tabela não permitida'}), 403
@@ -897,20 +803,16 @@ def get_table_data(table_name):
         conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
         
-        # Obter nomes das colunas
         cursor.execute(f'PRAGMA table_info({table_name})')
         columns = [column[1] for column in cursor.fetchall()]
         
-        # Obter dados
         cursor.execute(f'SELECT * FROM {table_name} ORDER BY created_at DESC LIMIT 1000')
         rows = cursor.fetchall()
         
-        # Converter para dicionários
         row_dicts = []
         for row in rows:
             row_dict = {}
             for i, value in enumerate(row):
-                # Converter datetime para string se necessário
                 if isinstance(value, datetime):
                     value = value.isoformat()
                 row_dict[columns[i]] = value
@@ -929,15 +831,13 @@ def get_table_data(table_name):
         if 'conn' in locals():
             conn.close()
 
-# Adicione uma rota para listar as tabelas disponíveis
-@app.route('/api/database/tables', methods=['GET'])
+@app.route("/api/database/tables", methods=["GET"])
 @token_required
 def get_available_tables():
     try:
         conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
         
-        # Obter lista de tabelas
         cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
         tables = [row[0] for row in cursor.fetchall()]
         
@@ -956,14 +856,12 @@ def get_available_tables():
 @app.route('/api/searches', methods=['GET'])
 @api_token_required
 def list_searches():
-    """Paginated list of searches with optional week filter (year-week)."""
     try:
         limit = int(request.args.get('limit', 50))
         offset = int(request.args.get('offset', 0))
-        year_week = request.args.get('year_week')  # format YYYY-WW
-        day_date = request.args.get('date')  # format YYYY-MM-DD
+        year_week = request.args.get('year_week')  
+        day_date = request.args.get('date')  
 
-        # Validate date if provided
         if day_date:
             try:
                 datetime.strptime(day_date, '%Y-%m-%d')
@@ -987,13 +885,7 @@ def list_searches():
         cursor.execute(base_query, params)
         rows = cursor.fetchall()
 
-        # total count
-        if day_date:
-            cursor.execute("SELECT COUNT(*) FROM query_response WHERE DATE(created_at) = ?", (day_date,))
-        elif year_week:
-            cursor.execute("SELECT COUNT(*) FROM query_response WHERE strftime('%Y-%W', created_at) = ?", (year_week,))
-        else:
-            cursor.execute("SELECT COUNT(*) FROM query_response")
+        cursor.execute("SELECT COUNT(*) FROM query_response")
         total = cursor.fetchone()[0]
 
         conn.close()
@@ -1019,7 +911,6 @@ def list_searches():
 @app.route('/api/searches/weekly', methods=['GET'])
 @api_token_required
 def searches_weekly():
-    """Return weekly aggregation in format: [{'year_week': '2025-35', 'count': 10}]"""
     try:
         conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
@@ -1040,7 +931,6 @@ def searches_weekly():
 @app.route('/api/searches/<int:search_id>/category', methods=['PUT'])
 @api_token_required
 def correct_search_category(search_id):
-    """Admin-only: correct the category/category_id assigned by AI."""
     try:
         token = request.cookies.get('token')
         user_data = jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
@@ -1086,10 +976,9 @@ def api_check_auth():
 @app.route('/api/searches/export', methods=['GET'])
 @api_token_required
 def export_searches_csv():
-    """Exporta buscas em CSV. Filtro opcional por semana (year_week = YYYY-WW)."""
     try:
         year_week = request.args.get('year_week')
-        day_date = request.args.get('date')  # format YYYY-MM-DD
+        day_date = request.args.get('date')  
 
         if day_date:
             try:
@@ -1134,7 +1023,6 @@ def export_searches_csv():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-# ===== Correções: marcar dia/semana como concluído =====
 def _require_admin():
     token = request.cookies.get('token')
     if not token:
@@ -1156,10 +1044,6 @@ def _require_admin():
 @app.route('/api/searches/corrections/status', methods=['GET'])
 @api_token_required
 def get_corrections_status():
-    """Retorna status de conclusão para um dia e/ou semana.
-    Query params: date=YYYY-MM-DD, year_week=YYYY-WW
-    Response: { day: true/false/null, week: true/false/null }
-    """
     try:
         day_date = request.args.get('date')
         year_week = request.args.get('year_week')
@@ -1180,10 +1064,6 @@ def get_corrections_status():
 @app.route('/api/searches/corrections/complete', methods=['POST'])
 @api_token_required
 def complete_corrections():
-    """Marca um dia ou semana como concluído.
-    Body JSON: { "type": "day|week", "key": "YYYY-MM-DD|YYYY-WW" }
-    Admin only.
-    """
     is_admin, user_id = _require_admin()
     if not is_admin:
         return jsonify({'error': 'Apenas administradores podem concluir correções.'}), 403
@@ -1199,7 +1079,6 @@ def complete_corrections():
             "INSERT OR REPLACE INTO correction_status (id, key_type, key_value, completed_by, completed_at)\n             SELECT id, ?, ?, ?, DATETIME('now') FROM (SELECT id FROM correction_status WHERE key_value = ?)\n            ",
             (key_type, key_value, user_id, key_value)
         )
-        # Se não existia, faz INSERT normal
         if cursor.rowcount == 0:
             cursor.execute(
                 "INSERT INTO correction_status (key_type, key_value, completed_by) VALUES (?, ?, ?)",
@@ -1214,10 +1093,6 @@ def complete_corrections():
 @app.route('/api/searches/corrections/uncomplete', methods=['POST'])
 @api_token_required
 def uncomplete_corrections():
-    """Desmarca um dia ou semana como concluído.
-    Body JSON: { "type": "day|week", "key": "YYYY-MM-DD|YYYY-WW" }
-    Admin only.
-    """
     is_admin, _ = _require_admin()
     if not is_admin:
         return jsonify({'error': 'Apenas administradores podem concluir correções.'}), 403
@@ -1239,9 +1114,6 @@ def uncomplete_corrections():
 @app.route('/api/searches/daily', methods=['GET'])
 @api_token_required
 def searches_daily():
-    """Retorna agregação diária em formato: [{'day': '2025-08-30', 'count': 12}].
-    Filtro opcional por semana (year_week = YYYY-WW).
-    """
     try:
         year_week = request.args.get('year_week')
         conn = sqlite3.connect(DB_PATH)
@@ -1262,14 +1134,9 @@ def searches_daily():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-
 @app.route('/api/searches/corrections/list', methods=['GET'])
 @api_token_required
 def list_corrections_keys():
-    """Lista chaves concluídas de correções por tipo.
-    Query params: type=day|week
-    Response: { keys: ["YYYY-MM-DD" | "YYYY-WW", ...] }
-    """
     try:
         key_type = request.args.get('type')
         if key_type not in ('day', 'week'):
@@ -1280,6 +1147,200 @@ def list_corrections_keys():
         keys = [r[0] for r in cursor.fetchall()]
         conn.close()
         return jsonify({'keys': keys}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+# ===== Helpers para gerenciamento de categorias =====
+def load_mapping():
+    with open(MAPPING_PATH, 'r', encoding='utf-8') as f:
+        return json.load(f)
+
+def save_mapping(mapping):
+    # Persistência com lock para evitar condições de corrida
+    with MAPPING_LOCK:
+        with open(MAPPING_PATH, 'w', encoding='utf-8') as f:
+            json.dump(mapping, f, ensure_ascii=False, indent=2)
+    # Atualiza cache em memória
+    global mapping_classes
+    mapping_classes = mapping
+
+def find_category_by_id(mapping, cat_id):
+    cat_id = str(cat_id)
+    for family, subcats in mapping.items():
+        for label, doc_map in subcats.items():
+            document = list(doc_map.keys())[0]
+            value_id = str(list(doc_map.values())[0])
+            if value_id == cat_id:
+                return {
+                    'family': family,
+                    'label': label,
+                    'document': document,
+                    'id': value_id,
+                }
+    return None
+
+def flatten_categories(mapping):
+    items = []
+    for family, subcats in mapping.items():
+        for label, doc_map in subcats.items():
+            document = list(doc_map.keys())[0]
+            value_id = str(list(doc_map.values())[0])
+            items.append({
+                'family': family,
+                'label': label,
+                'document': document,
+                'id': value_id,
+            })
+    return items
+
+def get_next_category_id(mapping):
+    max_id = 0
+    for family, subcats in mapping.items():
+        for label, doc_map in subcats.items():
+            try:
+                value_id = list(doc_map.values())[0]
+                max_id = max(max_id, int(value_id))
+            except Exception:
+                # Ignora ids não numéricos
+                continue
+    return str(max_id + 1)
+
+# ===== Rotas de Categorias (CRUD) =====
+@app.route('/api/categories', methods=['GET'])
+@api_token_required
+def list_categories():
+    try:
+        mapping = load_mapping()
+        return jsonify(flatten_categories(mapping)), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/categories', methods=['POST'])
+@api_token_required
+def create_category():
+    # Somente admin
+    is_admin, _ = _require_admin()
+    if not is_admin:
+        return jsonify({'error': 'Apenas administradores podem criar categorias.'}), 403
+
+    try:
+        data = request.get_json() or {}
+        family = data.get('family')
+        label = data.get('label')
+        document = data.get('document')
+        # id é gerado automaticamente
+        if not all([family, label, document]):
+            return jsonify({'error': 'Campos obrigatórios: family, label, document.'}), 400
+
+        mapping = load_mapping()
+
+        # Gerar próximo id (max+1)
+        cat_id = get_next_category_id(mapping)
+
+        # Cria família se não existir
+        if family not in mapping:
+            mapping[family] = {}
+
+        # Verifica label duplicado na família
+        if label in mapping[family]:
+            return jsonify({'error': 'Já existe uma subcategoria com este label nesta família.'}), 409
+
+        # Insere
+        mapping[family][label] = {document: str(cat_id)}
+        save_mapping(mapping)
+        return jsonify({'message': 'Categoria criada com sucesso.', 'id': str(cat_id)}), 201
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/categories/<cat_id>', methods=['PUT'])
+@api_token_required
+def update_category(cat_id):
+    # Somente admin
+    is_admin, _ = _require_admin()
+    if not is_admin:
+        return jsonify({'error': 'Apenas administradores podem editar categorias.'}), 403
+
+    try:
+        data = request.get_json() or {}
+        new_family = data.get('family')  # opcional: mover para outra família
+        new_label = data.get('label')    # opcional: renomear label
+        new_document = data.get('document')  # opcional
+        new_id = data.get('id')  # opcional: alterar id (mantendo unicidade)
+
+        mapping = load_mapping()
+        current = find_category_by_id(mapping, cat_id)
+        if not current:
+            return jsonify({'error': 'Categoria não encontrada.'}), 404
+
+        cur_family = current['family']
+        cur_label = current['label']
+        cur_document = current['document']
+        cur_id = current['id']
+
+        target_family = new_family if new_family else cur_family
+
+        # Se mudar ID, verificar unicidade
+        if new_id and str(new_id) != str(cur_id):
+            if find_category_by_id(mapping, new_id):
+                return jsonify({'error': 'Já existe uma categoria com o novo id informado.'}), 409
+
+        # Se mover de família, criar destino se não existir
+        if target_family not in mapping:
+            mapping[target_family] = {}
+
+        # Remover do local atual
+        try:
+            del mapping[cur_family][cur_label]
+            if not mapping[cur_family]:
+                # remove família vazia
+                del mapping[cur_family]
+        except KeyError:
+            pass
+
+        # Novo label/document/id
+        final_label = new_label if new_label else cur_label
+        final_document = new_document if new_document else cur_document
+        final_id = str(new_id) if new_id else str(cur_id)
+
+        # Conflito de label na família alvo
+        if final_label in mapping.get(target_family, {}):
+            return jsonify({'error': 'Já existe uma subcategoria com este label na família de destino.'}), 409
+
+        # Grava na família alvo
+        if target_family not in mapping:
+            mapping[target_family] = {}
+        mapping[target_family][final_label] = {final_document: final_id}
+
+        save_mapping(mapping)
+        return jsonify({'message': 'Categoria atualizada com sucesso.'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/categories/<cat_id>', methods=['DELETE'])
+@api_token_required
+def delete_category(cat_id):
+    # Somente admin
+    is_admin, _ = _require_admin()
+    if not is_admin:
+        return jsonify({'error': 'Apenas administradores podem apagar categorias.'}), 403
+
+    try:
+        mapping = load_mapping()
+        found = find_category_by_id(mapping, cat_id)
+        if not found:
+            return jsonify({'error': 'Categoria não encontrada.'}), 404
+
+        family = found['family']
+        label = found['label']
+        try:
+            del mapping[family][label]
+            if not mapping[family]:
+                del mapping[family]
+        except KeyError:
+            return jsonify({'error': 'Falha ao remover categoria.'}), 500
+
+        save_mapping(mapping)
+        return jsonify({'message': 'Categoria removida com sucesso.'}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
