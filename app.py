@@ -39,7 +39,7 @@ MAPPING_PATH = os.path.join(PROJECT_DIR, "data", "maping_classes.json")
 MAPPING_LOCK = threading.Lock()
 with open(MAPPING_PATH, "r", encoding="utf-8") as f:
     mapping_classes = json.load(f)
-
+print('oi')
 
 genai.configure(api_key=GEMINI_KEY)
 GEMINI_MODEL_NAME = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
