@@ -45,6 +45,18 @@ genai.configure(api_key=GEMINI_KEY)
 GEMINI_MODEL_NAME = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
 gemini_model = genai.GenerativeModel(GEMINI_MODEL_NAME)
 
+def find_category_by_id(mapping, cat_id):
+    """Retorna {"document", "id"} a partir do id dentro de mapping_classes.
+    Caso não encontre, retorna None.
+    """
+    for group in mapping.values():
+        for subcat in group.values():
+            document = list(subcat.keys())[0]
+            id_val = str(list(subcat.values())[0])
+            if id_val == str(cat_id):
+                return {"document": document, "id": id_val}
+    return None
+
 def save_to_db(query, response_data, degree_of_certainty=None):
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
@@ -380,31 +392,42 @@ def api_search_text():
                 {"message": "Não encontrei uma categoria para o produto. Pode descrever melhor?"}
             ), 404
 
-        options = []
-        for group in mapping_classes.values():
-            for subcat in group.values():
-                document = list(subcat.keys())[0]
-                cat_id = str(list(subcat.values())[0])
-                options.append({"document": document, "id": cat_id})
+        options_ids = []
+        options_ctx = []  # contexto com nomes para o modelo entender melhor
+        name_to_id = {}   # mapa direto Nome -> ID (ex.: {"Crossfit": "79"})
+        for family, subcats in mapping_classes.items():
+            for label, doc_map in subcats.items():
+                document = list(doc_map.keys())[0]
+                cat_id = str(list(doc_map.values())[0])
+                options_ids.append(cat_id)
+                options_ctx.append({
+                    "id": cat_id,
+                    "family": family,
+                    "name": document
+                })
+                name_to_id[document] = cat_id
 
-        if not options:
-            return jsonify({"error": "Catálogo de categorias vazio."}), 500
-
-        system_instruction = (
-            "Você é um classificador de intenção de compra. Dado um texto do usuário e uma lista de opções de categorias, "
-            "selecione a opção mais adequada. Responda SOMENTE com JSON estrito."
-        )
+        
         prompt = f"""
         Texto do usuário: "{query}"
-        Opções (lista de objetos com document e id): {json.dumps(options, ensure_ascii=False)}
-
+        
+        Opções disponíveis (apenas para CONTEXTO):
+        {json.dumps(options_ctx, ensure_ascii=False)}
+        
+        Mapa Nome->ID (apenas para CONTEXTO):
+        {json.dumps(name_to_id, ensure_ascii=False)}
+        
+        IDs válidos (responda escolhendo UM destes IDs):
+        {json.dumps(options_ids, ensure_ascii=False)}
+        
         Regras:
-        - Retorne estritamente um JSON no formato: {{"document": string, "id": string, "degree_of_certainty": number entre 0 e 1}}
+        - Retorne estritamente um JSON no formato: {{"id": string, "degree_of_certainty": number entre 0 e 1}}
         - Se nenhuma opção for apropriada, retorne: {{"None": true}}
         - Não adicione comentários, blocos markdown, ou chaves extras.
         - O campo id deve ser exatamente um dos ids presentes nas opções.
-        - O campo document deve corresponder exatamente ao document da opção escolhida.
+        - NÃO retorne nomes de categorias; apenas o id e a confiança.
         """
+        print(prompt)
         try:
             response = gemini_model.generate_content(prompt)
             response_text = response.text.strip()
@@ -420,12 +443,16 @@ def api_search_text():
                     {"message": "Não encontrei uma categoria para o produto. Pode descrever melhor?"}
                 ), 404
 
-            if not all(k in result for k in ["document", "id", "degree_of_certainty"]):
+            if not all(k in result for k in ["id", "degree_of_certainty"]):
                 return jsonify({"error": "Resposta do Gemini incompleta."}), 502
 
-            picked = next((o for o in options if o["id"] == str(result["id"]) and o["document"] == result["document"]), None)
-            if not picked:
-                return jsonify({"error": "ID/document retornado não corresponde às opções."}), 404
+            returned_id = str(result.get("id"))
+            if returned_id not in options_ids:
+                return jsonify({"error": "ID retornado não corresponde às opções."}), 404
+
+            found = find_category_by_id(mapping_classes, returned_id)
+            if not found:
+                return jsonify({"error": "ID não encontrado no catálogo."}), 404
 
             try:
                 certainty = float(result["degree_of_certainty"])
@@ -434,8 +461,8 @@ def api_search_text():
                 certainty = None
 
             payload = {
-                "document": picked["document"],
-                "id": picked["id"],
+                "document": found["document"],
+                "id": found["id"],
                 "degree_of_certainty": certainty,
             }
 
@@ -1163,21 +1190,6 @@ def save_mapping(mapping):
     # Atualiza cache em memória
     global mapping_classes
     mapping_classes = mapping
-
-def find_category_by_id(mapping, cat_id):
-    cat_id = str(cat_id)
-    for family, subcats in mapping.items():
-        for label, doc_map in subcats.items():
-            document = list(doc_map.keys())[0]
-            value_id = str(list(doc_map.values())[0])
-            if value_id == cat_id:
-                return {
-                    'family': family,
-                    'label': label,
-                    'document': document,
-                    'id': value_id,
-                }
-    return None
 
 def flatten_categories(mapping):
     items = []
