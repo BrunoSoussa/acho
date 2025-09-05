@@ -46,15 +46,18 @@ GEMINI_MODEL_NAME = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
 gemini_model = genai.GenerativeModel(GEMINI_MODEL_NAME)
 
 def find_category_by_id(mapping, cat_id):
-    """Retorna {"document", "id"} a partir do id dentro de mapping_classes.
+    """Retorna {"family", "label", "document", "id"} a partir do id dentro de mapping_classes.
     Caso não encontre, retorna None.
     """
-    for group in mapping.values():
-        for subcat in group.values():
-            document = list(subcat.keys())[0]
-            id_val = str(list(subcat.values())[0])
+    for family, subcats in mapping.items():
+        for label, doc_map in subcats.items():
+            try:
+                document = list(doc_map.keys())[0]
+                id_val = str(list(doc_map.values())[0])
+            except Exception:
+                continue
             if id_val == str(cat_id):
-                return {"document": document, "id": id_val}
+                return {"family": family, "label": label, "document": document, "id": id_val}
     return None
 
 def save_to_db(query, response_data, degree_of_certainty=None):

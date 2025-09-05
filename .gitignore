@@ -7,6 +7,7 @@ C:\Users\devBr\OneDrive\Área de Trabalho\acho\acho\sql
 C:\Users\devBr\OneDrive\Área de Trabalho\acho\acho\sql\queries_responses.db
 # C extensions
 *.so
+data\maping_classes.json
 
 # Distribution / packaging
 .Python
